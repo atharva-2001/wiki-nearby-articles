@@ -147,14 +147,14 @@ app.layout = html.Div([
             dcc.Graph(id = "forwards"),
             style = {
                 "width": "50%",
-                "display": "inline"
+                "display": "inline-block"
             }
         ),
         html.Div(
             dcc.Graph(id = "backwards"),
             style = {
                 "width": "50%",
-                "display": "inline"
+                "display": "inline-block"
             }
         )
     ])
@@ -172,15 +172,16 @@ app.layout = html.Div([
 def update_output(art_link):
     
     article_name = art_link.split("/")[-1]
-
+    print(article_name)
     art = art_from_origin(prop_params = "links", article_name = article_name)
-    _, forwards = create_random_populated_sphere(radius=1000, points=art, plot_flag=False, show_lines_with_origin=True)
+    print(art)
+    _, forwards = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
 
     art = art_from_origin(prop_params = "linkshere", article_name = article_name)
-    _, backwards = create_random_populated_sphere(radius=1000, points=art, plot_flag=False, show_lines_with_origin=True)
+    _, backwards = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
 
     return (forwards, backwards)
 
 
 if __name__ == '__main__':
-  app.run_server(debug=True, threaded=True)
+  app.run_server(debug=True)
