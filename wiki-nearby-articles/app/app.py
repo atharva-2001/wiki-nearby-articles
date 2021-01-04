@@ -14,8 +14,9 @@ app.layout = html.Div([
             style = {
                 "font-size": "72px",
                 "fontFamily": "monospace",
-                # "width": "100%",
-                "text-align": "center"
+                "letter-spacing": "5px",
+                "text-align": "center",
+                "font-weight": "light"
 
             }
         
