@@ -91,21 +91,36 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
         # text = points,
         marker=dict(
             size=0.1,
-            color = "blue",
+            color = "#303030",
             # colorscale='Viridis',   
             opacity=0.8
         ),
         mode = "lines"))
 
     fig.update_layout(
-        height  =1300, width = 2000,
+        height  =1000, width = 1000,
+        template = "plotly_dark",
+        scene = {
+            "xaxis": {
+                "visible": False,
+                "showticklabels": False
+            },
+            "yaxis": {
+                "visible": False,
+                "showticklabels": False
+            },
+            "zaxis": {
+                "visible": False,
+                "showticklabels": False
+            }
+        }
     )
     fig.update_traces(showlegend = False)   
     if plot_flag == True:
         fig.show()
 
 
-    return (coor, fig)
+    return fig
 
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
@@ -144,18 +159,18 @@ app.layout = html.Div([
     ]),
     html.Div([
         html.Div(
-            dcc.Graph(id = "forwards")
-            # style = {
-            #     "width": "50%",
-            #     "display": "inline-block"
-            # }
+            dcc.Graph(id = "forwards"),
+            style = {
+                "width": "50%",
+                "display": "inline-block"
+            }
         ),
         html.Div(
-            dcc.Graph(id = "backwards")
-            # style = {
-            #     "width": "50%",
-            #     "display": "inline-block"
-            # }
+            dcc.Graph(id = "backwards"),
+            style = {
+                "width": "50%",
+                "display": "inline-block"
+            }
         )
     ])
 ])
@@ -175,10 +190,10 @@ def update_output(art_link):
     print(article_name)
     art = art_from_origin(prop_params = "links", article_name = article_name)
     print(art)
-    _, forwards = create_random_populated_sphere(radius=100, points=art, plot_flag=True, show_lines_with_origin=True)
+    forwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True)
 
     art = art_from_origin(prop_params = "linkshere", article_name = article_name)
-    _, backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=True, show_lines_with_origin=True)
+    backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True)
 
     return (forwards, backwards)
 
