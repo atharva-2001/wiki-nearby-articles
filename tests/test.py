@@ -35,7 +35,7 @@ def art_from_origin(prop_params):
             art.append(l["title"])
     return art
 
-def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_origin):
+def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_origin, points_in_one_plot = 30, plot_index = 0):
     '''
     this function will return the figure and the coordinates in a tuple
     when asked to plot, it will plot it. 
@@ -45,6 +45,13 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
     show_lines_with_origin...boolean, whether to show connections or not
     returns (coordinates of the sphere and the fig in a tuple)
     '''
+    if len(points) <= points_in_one_plot: 
+        pass
+    else: 
+        points = [points[i:i+points_in_one_plot] for i in range(0, len(points), points_in_one_plot)]
+        points = points[plot_index]
+        
+    
     coor = [[],[],[]]
     index = 0
     while True:
@@ -85,7 +92,7 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
         # text = points,
         marker=dict(
             size=0.1,
-            color = "white",
+            color = "#303030",
             # colorscale='Viridis',   # choose a colorscale
             opacity=0.8
         ),
