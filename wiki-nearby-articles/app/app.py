@@ -9,6 +9,8 @@ import math
 import numpy as np
 import requests 
 
+# TODO add animations 
+# TODO between graphs as they are updated, extending graphs
 
 def art_from_origin(prop_params, article_name): 
     '''
@@ -111,7 +113,7 @@ def create_random_populated_sphere(
         mode = "lines"))
 
     fig.update_layout(
-        height  =1000, width = 1000,
+        height  =1500, width = 1500,
         template = "plotly_dark",
         scene = {
             "xaxis": {
@@ -150,7 +152,8 @@ app.layout = html.Div([
                 "fontFamily": "monospace",
                 "letter-spacing": "5px",
                 "text-align": "center",
-                "font-weight": "light"
+                "font-weight": "light",
+                "color": "#bdbdbd"
             }
         )
     ),
@@ -170,7 +173,8 @@ app.layout = html.Div([
                 "border": "none",
                 "border-bottom": "2px solid #5c5c5c",
                 "background-color": "#1a1a1a",
-                "color": "white"
+                "color": "white",
+                "padding-bottom": "3px"
                 }),
 
     ]),
@@ -178,15 +182,27 @@ app.layout = html.Div([
         html.Div(
             dcc.Graph(id = "forwards"),
             style = {
-                "width": "50%",
-                "display": "inline-block"
+                "width": "100%",
+                # "display": "inline-block",
+                "border":"3px #5c5c5c solid",
+                "padding-top": "5px"
             }
         ),
+        # html.Div(style = {
+        #         "width": "2%",
+        #         "display": "inline-block",
+        #         "padding-top": "5px"
+        #         # "border":"9px gray solid",
+        #         # "padding": "10px"
+        #     }),
         html.Div(
             dcc.Graph(id = "backwards"),
             style = {
-                "width": "50%",
-                "display": "inline-block"
+                "width": "100%",
+                # "display": "inline-block",
+                "border":"3px #5c5c5c solid",
+                "padding-top": "5px"
+                # "padding": "2px"
             }
         )
     ])
