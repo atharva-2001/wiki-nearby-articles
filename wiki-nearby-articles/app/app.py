@@ -41,7 +41,13 @@ def art_from_origin(prop_params, article_name):
             art.append(l["title"])
     return art
 
-def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_origin):
+def create_random_populated_sphere(
+    radius, points, plot_flag, show_lines_with_origin, 
+    points_in_one_plot = 30, 
+    plot_index = 0,
+    line_color = "#5c5c5c",
+    dot_color = "#525BCB"
+):
     '''
     this function will return the figure and the coordinates in a tuple
     when asked to plot, it will plot it. 
@@ -51,6 +57,13 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
     show_lines_with_origin...boolean, whether to show connections or not
     returns (coordinates of the sphere and the fig in a tuple)
     '''
+    if len(points) <= points_in_one_plot: 
+        pass
+    else: 
+        points = [points[i:i+points_in_one_plot] for i in range(0, len(points), points_in_one_plot)]
+        points = points[plot_index]
+        
+    
     coor = [[],[],[]]
     index = 0
     while True:
@@ -76,8 +89,8 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
         text = points,
         marker=dict(
             size=5,
-            colorscale='Viridis',   # choose a colorscale
-            opacity=0.8
+            color = dot_color,
+            opacity=0.5
         ),
         mode = "markers+text"
     ))
@@ -91,9 +104,9 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
         # text = points,
         marker=dict(
             size=0.1,
-            color = "#303030",
+            color = line_color,
             # colorscale='Viridis',   
-            opacity=0.8
+            # opacity=1
         ),
         mode = "lines"))
 
@@ -143,17 +156,21 @@ app.layout = html.Div([
     ),
     html.Div([
         dcc.Input(id = "art_link", 
+        className = "text_input",
         placeholder = "enter wikipedia article link",
         value = "https://en.wikipedia.org/wiki/MissingNo.",
         style={
                 "font-size": "18px",
-                "fontFamily": "Lucida Console",
+                "fontFamily": "monospace",
                 "margin": "0 auto",
                 "display": "center",
                 'width': '100%',
                 'text-align': 'center',
                 # 'padding-left':'10%', 'padding-right':'10%',
-                "color": "black"
+                "border": "none",
+                "border-bottom": "2px solid #5c5c5c",
+                "background-color": "#1a1a1a",
+                "color": "white"
                 }),
 
     ]),
@@ -193,7 +210,7 @@ def update_output(art_link):
     forwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True)
 
     art = art_from_origin(prop_params = "linkshere", article_name = article_name)
-    backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True)
+    backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True, dot_color="#ff3b3b")
 
     return (forwards, backwards)
 
