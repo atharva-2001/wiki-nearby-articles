@@ -92,7 +92,7 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
         marker=dict(
             size=0.1,
             color = "blue",
-            # colorscale='Viridis',   # choose a colorscale
+            # colorscale='Viridis',   
             opacity=0.8
         ),
         mode = "lines"))
@@ -144,18 +144,18 @@ app.layout = html.Div([
     ]),
     html.Div([
         html.Div(
-            dcc.Graph(id = "forwards"),
-            style = {
-                "width": "50%",
-                "display": "inline-block"
-            }
+            dcc.Graph(id = "forwards")
+            # style = {
+            #     "width": "50%",
+            #     "display": "inline-block"
+            # }
         ),
         html.Div(
-            dcc.Graph(id = "backwards"),
-            style = {
-                "width": "50%",
-                "display": "inline-block"
-            }
+            dcc.Graph(id = "backwards")
+            # style = {
+            #     "width": "50%",
+            #     "display": "inline-block"
+            # }
         )
     ])
 ])
@@ -175,10 +175,10 @@ def update_output(art_link):
     print(article_name)
     art = art_from_origin(prop_params = "links", article_name = article_name)
     print(art)
-    _, forwards = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
+    _, forwards = create_random_populated_sphere(radius=100, points=art, plot_flag=True, show_lines_with_origin=True)
 
     art = art_from_origin(prop_params = "linkshere", article_name = article_name)
-    _, backwards = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
+    _, backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=True, show_lines_with_origin=True)
 
     return (forwards, backwards)
 
