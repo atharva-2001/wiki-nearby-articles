@@ -4,7 +4,14 @@ import math
 import numpy as np
 import requests 
 
-def art_from_origin(): 
+def art_from_origin(prop_params): 
+    '''
+    prop params is the prop value in the api
+    links,
+    media
+    linkehere etc
+    returns and array containing the article link
+    '''
     S = requests.Session()
 
     URL = "https://en.wikipedia.org/w/api.php"
@@ -12,8 +19,8 @@ def art_from_origin():
     PARAMS = {
         "action": "query",
         "format": "json",
-        "titles": "Atom",
-        "prop": "links",
+        "titles": "Hurricane Irene (2005)",
+        "prop": prop_params,
         "pllimit": "max"
     }
 
@@ -24,7 +31,7 @@ def art_from_origin():
 
     art = []
     for k, v in PAGES.items():
-        for l in v["links"]:
+        for l in v[prop_params]:
             art.append(l["title"])
     return art
 
@@ -66,7 +73,7 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
             colorscale='Viridis',   # choose a colorscale
             opacity=0.8
         ),
-        mode = "markers"
+        mode = "markers+text"
     ))
 
 
@@ -75,16 +82,32 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
         x = [x_coor,0],
         y = [y_coor,0],
         z = [z_coor,0],
-        text = points,
+        # text = points,
         marker=dict(
             size=0.1,
-            colorscale='Viridis',   # choose a colorscale
+            color = "white",
+            # colorscale='Viridis',   # choose a colorscale
             opacity=0.8
         ),
         mode = "lines"))
 
     fig.update_layout(
-        height  =1300, width = 2000,
+        height  =1000, width = 1000,
+        template = "plotly_dark",
+        scene = {
+            "xaxis": {
+                "visible": False,
+                "showticklabels": False
+            },
+            "yaxis": {
+                "visible": False,
+                "showticklabels": False
+            },
+            "zaxis": {
+                "visible": False,
+                "showticklabels": False
+            }
+        }
     )
     fig.update_traces(showlegend = False)   
     if plot_flag == True:
@@ -93,6 +116,6 @@ def create_random_populated_sphere(radius, points, plot_flag, show_lines_with_or
 
     return (coor, fig)
 
-art = art_from_origin()
+art = art_from_origin(prop_params = "links")
 _, _ = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
 
