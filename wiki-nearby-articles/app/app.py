@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 import math
 import numpy as np
 import requests 
+import re
 
 # TODO add animations 
 # TODO between graphs as they are updated, extending graphs
@@ -42,6 +43,12 @@ def art_from_origin(prop_params, article_name):
         for l in v[prop_params]:
             art.append(l["title"])
     return art
+
+def find_hover_text(str):
+    lst = re.split(" ", str)
+    lst = [" ".join(lst[i: i+3]) for i in range(0, len(lst), 3)]
+    str = "<br>".join(["".join(item) for item in lst])
+    return str
 
 def create_random_populated_sphere(
     radius, points, plot_flag, show_lines_with_origin, 
@@ -82,7 +89,7 @@ def create_random_populated_sphere(
             coor[2].append(z)
             index+=1
 
-    print(len(coor[0]), len(points))
+    # print(len(coor[0]), len(points))
     fig = go.Figure()
     fig.add_trace(go.Scatter3d(
         x = coor[0],
@@ -94,26 +101,38 @@ def create_random_populated_sphere(
             color = dot_color,
             opacity=0.5
         ),
-        mode = "markers+text"
+        mode = "markers+text",
+        hovertext = [find_hover_text(article_summary_for_hover(article_name=point, number_of_lines=1)) for point in points],
+        hoverinfo = "text"
     ))
 
 
-    for x_coor,y_coor,z_coor in zip(coor[0], coor[1], coor[2]): 
+    for x_coor,y_coor,z_coor,point in zip(coor[0], coor[1], coor[2], points): 
         fig.add_trace(go.Scatter3d(
         x = [x_coor,0],
         y = [y_coor,0],
         z = [z_coor,0],
         # text = points,
+        # name = point,
         marker=dict(
             size=0.1,
             color = line_color,
             # colorscale='Viridis',   
             # opacity=1
-        ),
-        mode = "lines"))
+            ),
+        mode = "lines",
+        hoverinfo = "none"
+        # hovertemplate = f"{article_summary_for_hover(article_name=point, number_of_lines=2)}"
+        ))
 
     fig.update_layout(
-        height  = 800, width = 1100,
+        height  = 800, width = 870,
+        hoverlabel = {
+            "font": {
+                "family": "monospace"
+            },
+            # "hover"
+        },
         # template = "plotly_dark",
         font = {
             "family": "monospace",
@@ -148,6 +167,25 @@ def create_random_populated_sphere(
 
     return fig
 
+def article_summary_for_hover(article_name, number_of_lines):
+    S = requests.Session()
+    URL = "https://en.wikipedia.org/w/api.php"
+
+    PARAMS = {
+        "action": "query",
+        "format": "json",
+        "titles": article_name,
+        "prop": "extracts",
+        "exsentences":number_of_lines,
+        "exlimit": "1",
+        "explaintext": "1",
+        "formatversion": "2"
+    }
+
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+    PAGES = DATA["query"]["pages"][0]
+    return PAGES["extract"]
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
@@ -168,7 +206,7 @@ app.layout = html.Div([
                 "letter-spacing": "5px",
                 "text-align": "center",
                 "font-weight": "light",
-                "color": "#bdbdbd"
+                "color": "#525252"
             }
         )
     ),
@@ -183,7 +221,7 @@ app.layout = html.Div([
         style={
                 "font-size": "18px",
                 "fontFamily": "monospace",
-                "margin": "0 auto",
+                "margin": "0  auto",
                 "display": "center",
                 'width': '100%',
                 'text-align': 'center',
@@ -191,7 +229,7 @@ app.layout = html.Div([
                 "border": "none",
                 "border-bottom": "2px solid #5c5c5c",
                 # "background-color": "#1a1a1a",
-                "color": "#bdbdbd",
+                "color": "#525252",
                 "padding-bottom": "3px"
                 }),
 
@@ -231,12 +269,17 @@ app.layout = html.Div([
     ]),
     html.Div([
         html.Div(
-            dcc.Graph(id = "forwards"),
+            dcc.Graph(
+                id = "forwards",
+                responsive = True
+            ),
             style = {
                 "width": "48%",
                 "display": "inline-block",
                 "border":"3px #5c5c5c solid",
-                "padding-top": "5px"
+                "padding-top": "5px",
+                "padding-right": "1px"
+                
             }
         ),
         html.Div(style = {
@@ -247,12 +290,16 @@ app.layout = html.Div([
                 # "padding": "10px"
             }),
         html.Div(
-            dcc.Graph(id = "backwards"),
+            dcc.Graph(
+                id = "backwards",
+                responsive = True
+            ),
             style = {
                 "width": "48%",
                 "display": "inline-block",
                 "border":"3px #5c5c5c solid",
-                "padding-top": "5px"
+                "padding-top": "5px",
+                "padding-left": "1px"
                 # "padding": "2px"
             }
         )
@@ -271,9 +318,9 @@ app.layout = html.Div([
 def update_output(art_link):
     
     article_name = art_link.split("/")[-1]
-    print(article_name)
+    # print(article_name)
     art = art_from_origin(prop_params = "links", article_name = article_name)
-    print(art)
+    # print(art)
     forwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True)
 
     art = art_from_origin(prop_params = "linkshere", article_name = article_name)
