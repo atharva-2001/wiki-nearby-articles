@@ -113,8 +113,12 @@ def create_random_populated_sphere(
         mode = "lines"))
 
     fig.update_layout(
-        height  =1500, width = 1500,
-        template = "plotly_dark",
+        height  = 800, width = 1100,
+        # template = "plotly_dark",
+        font = {
+            "family": "monospace",
+            "size": 18
+        },
         scene = {
             "xaxis": {
                 "visible": False,
@@ -128,6 +132,13 @@ def create_random_populated_sphere(
                 "visible": False,
                 "showticklabels": False
             }
+        },
+        margin = {
+            "pad": 0,
+            "t": 0,
+            "r": 0,
+            "l": 0,
+            "b": 0,
         }
     )
     fig.update_traces(showlegend = False)   
@@ -140,7 +151,11 @@ def create_random_populated_sphere(
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+app = dash.Dash(__name__, 
+        # external_stylesheets=[dbc.themes.DARKLY]
+        external_stylesheets=external_stylesheets
+        
+        )
 
 app.layout = html.Div([
     
@@ -157,6 +172,9 @@ app.layout = html.Div([
             }
         )
     ),
+    html.Div(
+        html.Hr()
+    ),
     html.Div([
         dcc.Input(id = "art_link", 
         className = "text_input",
@@ -172,34 +190,67 @@ app.layout = html.Div([
                 # 'padding-left':'10%', 'padding-right':'10%',
                 "border": "none",
                 "border-bottom": "2px solid #5c5c5c",
-                "background-color": "#1a1a1a",
-                "color": "white",
+                # "background-color": "#1a1a1a",
+                "color": "#bdbdbd",
                 "padding-bottom": "3px"
                 }),
 
     ]),
     html.Div([
         html.Div(
+            html.P("fowards"),
+            style = {
+                "width": "48%",
+                "font-size": "18px",
+                "letter-spacing": "5px",
+                "font-family": "monospace",
+                "display": "inline-block",
+                "text-align": "center"
+            }
+        ),
+        html.Div(
+            html.P(),
+            style = {
+                "width": "2%",
+                "display": "inline-block",
+                "text-align": "center"
+            }
+        ),
+        html.Div(
+            html.P("backwards"),
+            style = {
+                "width": "48%",
+                "font-size": "18px",
+                "letter-spacing": "5px",
+                "font-family": "monospace",
+                "display": "inline-block",
+                "text-align": "center"
+            }
+        ),
+        
+    ]),
+    html.Div([
+        html.Div(
             dcc.Graph(id = "forwards"),
             style = {
-                "width": "100%",
-                # "display": "inline-block",
+                "width": "48%",
+                "display": "inline-block",
                 "border":"3px #5c5c5c solid",
                 "padding-top": "5px"
             }
         ),
-        # html.Div(style = {
-        #         "width": "2%",
-        #         "display": "inline-block",
-        #         "padding-top": "5px"
-        #         # "border":"9px gray solid",
-        #         # "padding": "10px"
-        #     }),
+        html.Div(style = {
+                "width": "2%",
+                "display": "inline-block",
+                "padding-top": "5px"
+                # "border":"9px gray solid",
+                # "padding": "10px"
+            }),
         html.Div(
             dcc.Graph(id = "backwards"),
             style = {
-                "width": "100%",
-                # "display": "inline-block",
+                "width": "48%",
+                "display": "inline-block",
                 "border":"3px #5c5c5c solid",
                 "padding-top": "5px"
                 # "padding": "2px"
