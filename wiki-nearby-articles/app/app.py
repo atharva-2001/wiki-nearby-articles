@@ -50,9 +50,13 @@ def find_hover_text(str):
     str = "<br>".join(["".join(item) for item in lst])
     return str
 
+def get_points(points, points_in_one_plot):
+    points = [points[i:i+points_in_one_plot] for i in range(0, len(points), points_in_one_plot)]
+    return points
+
 def create_random_populated_sphere(
     radius, points, plot_flag, show_lines_with_origin, 
-    points_in_one_plot = 30, 
+    points_in_one_plot = 15, 
     plot_index = 0,
     line_color = "#5c5c5c",
     dot_color = "#525BCB"
@@ -66,12 +70,14 @@ def create_random_populated_sphere(
     show_lines_with_origin...boolean, whether to show connections or not
     returns (coordinates of the sphere and the fig in a tuple)
     '''
+
+    # ! this is going to change
     if len(points) <= points_in_one_plot: 
         pass
     else: 
-        points = [points[i:i+points_in_one_plot] for i in range(0, len(points), points_in_one_plot)]
+        points = get_points(points=points, points_in_one_plot=points_in_one_plot)
         points = points[plot_index]
-        
+    # ! I will pass better points 
     
     coor = [[],[],[]]
     index = 0
@@ -192,7 +198,6 @@ external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 app = dash.Dash(__name__, 
         # external_stylesheets=[dbc.themes.DARKLY]
         external_stylesheets=external_stylesheets
-        
         )
 
 app.layout = html.Div([
@@ -211,12 +216,37 @@ app.layout = html.Div([
         )
     ),
     html.Div(
-        html.Hr()
+        html.Hr(),
+        style = {
+            "padding-bottom": "1px"
+        }
     ),
+    # html.Div(
+    #     html.Hr()
+    # ),
+    html.Div(
+        html.P("enter article link below"),
+        style={
+                "font-size": "13px",
+                "letter-spacing": "2px",
+                "fontFamily": "monospace",
+                "margin": "0  auto",
+                "display": "center",
+                'width': '100%',
+                'text-align': 'center',
+                # 'padding-left':'10%', 'padding-right':'10%',
+                "border": "none",
+                "border-bottom": "2px solid #5c5c5c",
+                # "background-color": "#1a1a1a",
+                "color": "#9c9c9c",
+                "padding-bottom": "3px"
+                }
+    ),
+
     html.Div([
         dcc.Input(id = "art_link", 
         className = "text_input",
-        placeholder = "enter wikipedia article link",
+        # placeholder = "enter wikipedia article link",
         value = "https://en.wikipedia.org/wiki/MissingNo.",
         style={
                 "font-size": "18px",
@@ -225,6 +255,7 @@ app.layout = html.Div([
                 "display": "center",
                 'width': '100%',
                 'text-align': 'center',
+                "text-spacing": "1px",
                 # 'padding-left':'10%', 'padding-right':'10%',
                 "border": "none",
                 "border-bottom": "2px solid #5c5c5c",
@@ -236,7 +267,21 @@ app.layout = html.Div([
     ]),
     html.Div([
         html.Div(
-            html.P("fowards"),
+            dcc.Dropdown(
+            id = "choose-section-forward",
+            # ! options will depend upon the link
+            # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = forward_points, points_in_one_plot= 15))]
+        )),
+        html.Div(dcc.Dropdown(
+            id = "choose-section-backward",
+            # ! options will depend upon the link
+            # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
+        ))
+        
+    ]),
+    html.Div([
+        html.Div(
+            html.P("article directs to these articles"),
             style = {
                 "width": "48%",
                 "font-size": "18px",
@@ -255,7 +300,7 @@ app.layout = html.Div([
             }
         ),
         html.Div(
-            html.P("backwards"),
+            html.P("article is directed from these articles"),
             style = {
                 "width": "48%",
                 "font-size": "18px",
