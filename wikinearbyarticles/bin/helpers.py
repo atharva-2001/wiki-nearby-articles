@@ -41,9 +41,10 @@ class helpers():
         PAGES = DATA["query"]["pages"]
 
         points = []
+        print("getting points...")
         for k, v in PAGES.items():
             for l in v[prop_params]:
-                print(f"appending {l['title']} to lst ")
+                # print(f"appending {l['title']} to lst ")
                 points.append(l["title"])
 
 
@@ -53,6 +54,8 @@ class helpers():
         # should I call all points at once or is it possible to call them a few at at time?
         # the get points funtion wont be used I guess
         self.points = points
+        print("got points")
+
 
     
 
@@ -63,7 +66,7 @@ class helpers():
         hover_text = []
 
         self.points = self.points[plot_index]
-
+        print("getting summary...")
         for point in self.points:
             PARAMS = {
                 "action": "query",
@@ -76,9 +79,6 @@ class helpers():
                 "formatversion": "2"
             }
 
-            # TODO print updates
-            print(f"getting summary for {point}", end = "\r")
-
             R = S.get(url=URL, params=PARAMS)
             DATA = R.json()
             hover_text_for_one_point = find_hover_text(DATA["query"]["pages"][0]["extract"])
@@ -86,6 +86,7 @@ class helpers():
 
         # ! do you want summary of the article selected?
         self.hover_text = hover_text
+        print("got summary")
 
     def plot_points(
         self,
@@ -192,7 +193,7 @@ class helpers():
             fig.show()
 
 
-        self.fig = fig
+        # self.fig = fig
 
         return fig
 
