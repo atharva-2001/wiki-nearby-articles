@@ -38,10 +38,7 @@ app.layout = html.Div([
         )
     ),
     html.Div(
-        html.Hr(),
-        style = {
-            "padding-bottom": "1px"
-        }
+        html.Hr()
     ),
     # html.Div(
     #     html.Hr()
@@ -58,7 +55,7 @@ app.layout = html.Div([
                 'text-align': 'center',
                 # 'padding-left':'10%', 'padding-right':'10%',
                 "border": "none",
-                "border-bottom": "2px solid #5c5c5c",
+                "border-bottom": "0px solid #5c5c5c",
                 # "background-color": "#1a1a1a",
                 "color": "#9c9c9c",
                 "padding-bottom": "3px"
@@ -80,13 +77,43 @@ app.layout = html.Div([
                 "text-spacing": "1px",
                 # 'padding-left':'10%', 'padding-right':'10%',
                 "border": "none",
-                "border-bottom": "2px solid #5c5c5c",
+                "border-bottom": "0.5px solid #5c5c5c",
                 # "background-color": "#1a1a1a",
                 "color": "#525252",
                 "padding-bottom": "3px"
                 }),
 
     ]),
+
+    html.Div([
+        html.Div(
+            html.P(id = "main-article-summary"),
+            style = {
+                "font-size": "17px",
+                "letter-spacing": "2px",
+                "fontFamily": "monospace",
+                "margin": "0  auto",
+                "display": "center",
+                'width': '60%',
+                'text-align': 'center',
+                # 'padding-left':'10%', 'padding-right':'10%',
+                "border": "none",
+                # "border-bottom": "2px solid #5e5e5e",
+                # "background-color": "#1a1a1a",
+                "color": "#5e5e5e",
+                # "padding-bottom": "3px",
+                "padding-left": "10px",
+                "padding-right": "10px",
+                "padding-top": "10px",
+                
+            }
+        )
+    ]),
+    html.Div(
+        html.Br()
+    ),
+
+    
     html.Div([
         html.Div(
             dcc.Dropdown(
@@ -178,7 +205,8 @@ app.layout = html.Div([
 
 @app.callback([
     dash.dependencies.Output("forwards", "figure"),
-    dash.dependencies.Output("backwards", "figure")
+    dash.dependencies.Output("backwards", "figure"),
+    dash.dependencies.Output("main-article-summary", "children")
 ],
     dash.dependencies.Input("art_link", "value")
 )
@@ -193,6 +221,26 @@ def update_output(art_link):
     # art = art_from_origin(prop_params = "linkshere", article_name = article_name)
     # backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True, dot_color="#ff3b3b")
 
+    # TODO this is a temporary solution, fix it
+    title = art_link.split("/")[-1]
+    S = requests.Session()
+    URL = "https://en.wikipedia.org/w/api.php"
+    PARAMS = {
+        "action": "query",
+        "format": "json",
+        "titles": title,
+        "prop": "extracts",
+        "exsentences":"5",
+        "exlimit": "1",
+        "explaintext": "1",
+        "formatversion": "2"
+    }
+
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+    summary = DATA["query"]["pages"][0]["extract"]
+
+
     forwards = helpers(
         link = art_link,
         prop_params = "links"
@@ -206,7 +254,7 @@ def update_output(art_link):
     backwards = backwards.plot_points(dot_color="#ff3b3b")
     
 
-    return (forwards, backwards)
+    return (forwards, backwards, summary)
 
 
 def run(port=8050, host='127.0.0.1', debug = False):
