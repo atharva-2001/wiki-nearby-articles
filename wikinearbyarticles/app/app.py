@@ -161,6 +161,10 @@ app.layout = html.Div([
         ),
         
     ]),
+    html.Div(
+        html.Br()
+    ),
+
     html.Div([
         html.Div(
             dcc.Graph(
@@ -169,17 +173,21 @@ app.layout = html.Div([
             ),
             style = {
                 "width": "48%",
+                "height": "500px",
                 "display": "inline-block",
                 "border":"3px #5c5c5c solid",
                 "padding-top": "5px",
-                "padding-right": "1px"
+                "padding-right": "1px",
+                "overflow": "hidden"
                 
             }
         ),
         html.Div(style = {
                 "width": "2%",
+                "height": "500px",
                 "display": "inline-block",
-                "padding-top": "5px"
+                "padding-top": "5px",
+                "overflow": "hidden"
                 # "border":"9px gray solid",
                 # "padding": "10px"
             }),
@@ -190,10 +198,12 @@ app.layout = html.Div([
             ),
             style = {
                 "width": "48%",
+                "height": "500px",
                 "display": "inline-block",
                 "border":"3px #5c5c5c solid",
                 "padding-top": "5px",
-                "padding-left": "1px"
+                "padding-left": "1px",
+                "overflow": "hidden"
                 # "padding": "2px"
             }
         )
