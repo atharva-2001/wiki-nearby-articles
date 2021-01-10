@@ -9,6 +9,7 @@ import math
 import numpy as np
 import requests 
 import re
+import json
 from wikinearbyarticles.bin.helpers import helpers
 
 # TODO add animations 
@@ -207,7 +208,51 @@ app.layout = html.Div([
                 # "padding": "2px"
             }
         )
+    ]),
+    html.Div([
+        html.Div(
+            html.P(id = "forward-hover-description"),
+            style = {
+                "width": "48%",
+                "font-size": "12px",
+                "height": "100px",
+                # "letter-spacing": "5px",
+                "font-family": "monospace",
+                "display": "inline-block",
+                "text-align": "center",
+                "border":"3px #5c5c5c solid",
+                "padding-top": "5px",
+                "padding-left": "1px",
+                "overflow": "scroll"
+            }
+        ),
+        html.Div(
+            html.P(),
+            style = {
+                "width": "2%",
+                "display": "inline-block",
+                "text-align": "center"
+            }
+        ),
+        html.Div(
+            html.P(id = "backward-hover-description"),
+            style = {
+                "width": "48%",
+                "font-size": "12px",
+                "height": "10px",
+                # "letter-spacing": "5px",
+                "font-family": "monospace",
+                "display": "inline-block",
+                "text-align": "center",
+                "border":"3px #5c5c5c solid",
+                "padding-top": "5px",
+                "padding-left": "1px",
+                "overflow": "scroll"
+            }
+        ),
+        
     ])
+    
 ])
 
 # art = art_from_origin(prop_params = "linkshere")
@@ -265,6 +310,20 @@ def update_output(art_link):
     
 
     return (forwards, backwards, summary)
+
+@app.callback(
+    dash.dependencies.Output("forward-hover-description", "children"),
+    dash.dependencies.Input("forwards", "hoverData")
+)
+def show_hover_text(data):
+    return json.dumps(data, indent=2)
+
+@app.callback(
+    dash.dependencies.Output("backward-hover-description", "children"),
+    dash.dependencies.Input("backwards", "hoverData")
+)
+def show_hover_text(data):
+    return json.dumps(data, indent=2)
 
 
 def run(port=8050, host='127.0.0.1', debug = False):
