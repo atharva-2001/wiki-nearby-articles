@@ -8,8 +8,7 @@
 This is a dash app that shows on localhost.
 
 In order to try the app, clone the repo and install the required dependencies. 
-Then run the ```run.py``` file:
-<br>
+Then run the ```run.py``` file:  
 ```python run.py```
 
 Work in progress by Atharva Arya.
