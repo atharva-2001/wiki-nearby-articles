@@ -130,7 +130,7 @@ class helpers():
                 opacity=0.5
             ),
             mode = "markers+text",
-            hovertext = self.hover_text,
+            hovertext = self.points,
             hoverinfo = "text"
         ))
 
