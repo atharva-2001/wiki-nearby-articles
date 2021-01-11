@@ -121,12 +121,30 @@ app.layout = html.Div([
             id = "choose-section-forward",
             # ! options will depend upon the link
             # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = forward_points, points_in_one_plot= 15))]
-        )),
+            ),
+            style = {
+                "width": "48%",
+                "font-size": "18px",
+                "letter-spacing": "5px",
+                "font-family": "monospace",
+                "display": "inline-block",
+                "text-align": "center"
+            }
+        ),
         html.Div(dcc.Dropdown(
             id = "choose-section-backward",
             # ! options will depend upon the link
             # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
-        ))
+            ),
+            style = {
+                "width": "48%",
+                "font-size": "18px",
+                "letter-spacing": "5px",
+                "font-family": "monospace",
+                "display": "inline-block",
+                "text-align": "center"
+            }
+        )
         
     ]),
     html.Div([
@@ -239,7 +257,7 @@ app.layout = html.Div([
             style = {
                 "width": "48%",
                 "font-size": "12px",
-                "height": "10px",
+                "height": "100spx",
                 # "letter-spacing": "5px",
                 "font-family": "monospace",
                 "display": "inline-block",
