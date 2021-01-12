@@ -10,7 +10,7 @@ import numpy as np
 import requests
 import re
 import json
-from wikinearbyarticles.bin.helpers import helpers
+from wikinearbyarticles.bin.helpers import wna
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
@@ -331,10 +331,10 @@ def update_output(art_link):
     DATA = R.json()
     summary = DATA["query"]["pages"][0]["extract"]
 
-    forwards = helpers(link=art_link, prop_params="links")
+    forwards = wna(link=art_link, prop_params="links")
     forwards = forwards.plot_points()
 
-    backwards = helpers(link=art_link, prop_params="linkshere")
+    backwards = wna(link=art_link, prop_params="linkshere")
     backwards = backwards.plot_points(dot_color="#ff3b3b")
 
     return (forwards, backwards, summary)
@@ -345,7 +345,16 @@ def update_output(art_link):
     dash.dependencies.Input("forwards", "hoverData"),
 )
 def show_hover_text(data):
-    return json.dumps(data, indent=2)
+    try:
+        art_name = data["points"][0]["hovertext"]
+        wna_hover = wna(link = art_name, prop_params="links")
+        hover = wna_hover.article_summary_for_hover()
+        # print(hover, type(hover))
+        text = hover["query"]["pages"][0]["extract"]
+    except:
+        text = ""
+        pass
+    return text
 
 
 @app.callback(
@@ -353,8 +362,16 @@ def show_hover_text(data):
     dash.dependencies.Input("backwards", "hoverData"),
 )
 def show_hover_text(data):
-    return json.dumps(data, indent=2)
-
+    try:
+        art_name = data["points"][0]["hovertext"]
+        wna_hover = wna(link = art_name, prop_params="links")
+        hover = wna_hover.article_summary_for_hover()
+        # print(hover, type(hover))
+        text = hover["query"]["pages"][0]["extract"]
+    except:
+        text = ""
+        pass
+    return text
 
 def run(port=8050, host="127.0.0.1", debug=True):
     app.run_server(debug=debug, port=port, host=host)

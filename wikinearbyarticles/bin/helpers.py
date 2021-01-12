@@ -4,7 +4,9 @@ import re
 import math
 import numpy as np
 import plotly.graph_objects as go
-
+from time import sleep
+import sys
+import os
 
 def find_hover_text(str):
     lst = re.split(" ", str)
@@ -12,8 +14,42 @@ def find_hover_text(str):
     str = "<br>".join(["".join(item) for item in lst])
     return str
 
+# 
+#  @todo hover should call api that returns summary data 
+#  @body helpers class doesnt automatically call data, use the class to call hover data for other article names too
+# 
+# 
+def spinning_cursor():
+  while True:
+    for cursor in '\\|/-':
+      sleep(0.1)
+      # Use '\r' to move cursor back to line beginning
+      # Or use '\b' to erase the last character
+      sys.stdout.write('\r{}'.format(cursor))
+      # Force Python to write data into terminal.
+      sys.stdout.flush()
 
-class helpers:
+def get_calls(article_name, number_of_lines=7):
+    S = requests.Session()
+    URL = "https://en.wikipedia.org/w/api.php"
+
+    PARAMS = {
+                "action": "query",
+                "format": "json",
+                "titles": article_name,
+                "prop": "extracts",
+                "exsentences": number_of_lines,
+                "exlimit": "1",
+                "explaintext": "1",
+                "formatversion": "2",
+                }
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+    sys.stdout.flush()
+    # print(DATA)
+    # os._exit(0)
+    return DATA
+class wna:
     def __init__(
         self,
         link,
@@ -21,10 +57,15 @@ class helpers:
         points_in_one_plot=15,
     ):
         self.link = link
-        self.article_name = link.split("/")[-1]
+        if "wiki" not in link:
+            self.article_name = link
+        else:
+            self.article_name = link.split("/")[-1]
         self.prop_params = prop_params
         self.points_in_one_plot = points_in_one_plot
+        self.points = []
 
+    def collect_points(self):
         S = requests.Session()
 
         URL = "https://en.wikipedia.org/w/api.php"
@@ -44,13 +85,13 @@ class helpers:
         points = []
         print("getting points...")
         for k, v in PAGES.items():
-            for l in v[prop_params]:
+            for l in v[self.prop_params]:
                 # print(f"appending {l['title']} to lst ")
                 points.append(l["title"])
 
         points = [
-            points[i : i + points_in_one_plot]
-            for i in range(0, len(points), points_in_one_plot)
+            points[i : i + self.points_in_one_plot]
+            for i in range(0, len(points), self.points_in_one_plot)
         ]
 
         # * the total number of articles connected to the main article
@@ -59,36 +100,45 @@ class helpers:
         self.points = points
         print("got points")
 
-    def article_summary_for_hover(self, number_of_lines=2, plot_index=0):
-        S = requests.Session()
-        URL = "https://en.wikipedia.org/w/api.php"
+    def article_summary_for_hover(self, number_of_lines=2, plot_index=0, display_all_summaries = False, collect_points = False):
+        if collect_points == False: # TODO fix this
+            self.collect_points()
+            self.points = self.points[plot_index]
+        if display_all_summaries == True:
+            S = requests.Session()
+            URL = "https://en.wikipedia.org/w/api.php"
 
-        hover_text = []
+            hover_text = []
 
-        self.points = self.points[plot_index]
-        print("getting summary...")
-        for point in self.points:
-            PARAMS = {
-                "action": "query",
-                "format": "json",
-                "titles": point,
-                "prop": "extracts",
-                "exsentences": number_of_lines,
-                "exlimit": "1",
-                "explaintext": "1",
-                "formatversion": "2",
-            }
+            self.points = self.points[plot_index]
 
-            R = S.get(url=URL, params=PARAMS)
-            DATA = R.json()
-            hover_text_for_one_point = find_hover_text(
-                DATA["query"]["pages"][0]["extract"]
-            )
-            hover_text.append(hover_text_for_one_point)
+            print("getting summary...")
+            for point in self.points:
+                PARAMS = {
+                    "action": "query",
+                    "format": "json",
+                    "titles": point,
+                    "prop": "extracts",
+                    "exsentences": number_of_lines,
+                    "exlimit": "1",
+                    "explaintext": "1",
+                    "formatversion": "2",
+                }
 
-        # ! do you want summary of the article selected?
-        self.hover_text = hover_text
-        print("got summary")
+                R = S.get(url=URL, params=PARAMS)
+                DATA = R.json()
+                hover_text_for_one_point = find_hover_text(
+                    DATA["query"]["pages"][0]["extract"]
+                )
+                hover_text.append(hover_text_for_one_point)
+
+            # ! do you want summary of the article selected?
+            self.hover_text = hover_text
+            print("got summary")
+        else:
+            print(f"trying to get hover text for {self.article_name}")
+            return get_calls(article_name=self.article_name)
+            
 
     def plot_points(
         self,
@@ -185,5 +235,5 @@ class helpers:
             fig.show()
 
         # self.fig = fig
-
         return fig
+
