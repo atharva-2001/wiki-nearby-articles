@@ -1,5 +1,6 @@
 from logging import PlaceHolder
 import dash
+from dash.dependencies import State
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
@@ -23,6 +24,29 @@ app = dash.Dash(
     # external_stylesheets=[dbc.themes.DARKLY]
     external_stylesheets=external_stylesheets,
 )
+
+net_layout = {
+    "height": 1200,
+    "width": 800,
+    "hoverlabel": {
+        "font": {"family": "monospace"},
+        # "hover"
+    },
+    # template = "plotly_dark",
+    "font": {"family": "monospace", "size": 18},
+    "scene": {
+        "xaxis": {"visible": False, "showticklabels": False},
+        "yaxis": {"visible": False, "showticklabels": False},
+        "zaxis": {"visible": False, "showticklabels": False},
+    },
+    "margin": {
+        "pad": 0,
+        "t": 0,
+        "r": 0,
+        "l": 0,
+        "b": 0,
+    },
+}
 
 app.layout = html.Div(
     [
@@ -218,7 +242,7 @@ app.layout = html.Div(
                     html.P(id="forward-hover-description"),
                     style={
                         "width": "26%",
-                        "font-size": "12px",
+                        "font-size": "15.5px",
                         "height": "800px",
                         "font-family": "monospace",
                         "display": "inline-block",
@@ -266,12 +290,10 @@ app.layout = html.Div(
                     },
                 ),
                 html.Div(
-                    html.P(
-                        id="backward-hover-description"
-                    ),
+                    html.P(id="backward-hover-description"),
                     style={
                         "width": "26%",
-                        "font-size": "12px",
+                        "font-size": "15.5px",
                         "height": "800px",
                         "font-family": "monospace",
                         "display": "inline-block",
@@ -333,6 +355,7 @@ def update_output(art_link):
 
     forwards = wna(link=art_link, prop_params="links")
     forwards = forwards.plot_points()
+    forwards["layout"] = net_layout
 
     backwards = wna(link=art_link, prop_params="linkshere")
     backwards = backwards.plot_points(dot_color="#ff3b3b")
@@ -347,18 +370,23 @@ def update_output(art_link):
 def show_hover_text(data):
     try:
         # print(data)
-        data =  data["points"][0]
+        data = data["points"][0]
         if "hovertext" not in data.keys():
             print("hovering on lines")
             text = ""
         else:
-            print("hovering on point ", end = "")
+            print("hovering on point ", end="")
             art_name = data["hovertext"]
             print(art_name)
-            wna_hover = wna(link = art_name, prop_params="links")
-            hover = wna_hover.article_summary_for_hover(collect_points=False)
+            wna_hover = wna(link=art_name, prop_params="links")
+            hover = wna_hover.article_summary_for_hover(
+                collect_points=False, number_of_lines=8
+            )
             # print(hover, type(hover))
             text = hover["query"]["pages"][0]["extract"]
+            if text == "":
+                text = "no summary available"
+            print("got hover data")
     except:
         text = ""
         pass
@@ -372,22 +400,38 @@ def show_hover_text(data):
 def show_hover_text(data):
     try:
         # print(data)
-        data =  data["points"][0]
+        data = data["points"][0]
         if "hovertext" not in data.keys():
             print("hovering on lines")
             text = ""
         else:
-            print("hovering on point ", end = "")
+            print("hovering on point ", end="")
             art_name = data["hovertext"]
             print(art_name)
-            wna_hover = wna(link = art_name, prop_params="links")
-            hover = wna_hover.article_summary_for_hover(collect_points=False)
+            wna_hover = wna(link=art_name, prop_params="links")
+            hover = wna_hover.article_summary_for_hover(
+                collect_points=False, number_of_lines=8
+            )
             # print(hover, type(hover))
             text = hover["query"]["pages"][0]["extract"]
+            if text == "":
+                text = "no summary available"
+            print("got hover data")
     except:
         text = ""
         pass
     return text
+
+
+# @app.callback(
+#     dash.dependencies.Output("forwards", "figure"),
+#     [dash.dependencies.Input("art_link", "value")],
+#     [State("forwards", "figure")]
+# )
+# def set_layout(value, fig):
+#     fig["layout"] = net_layout
+#     return fig
+
 
 def run(port=8050, host="127.0.0.1", debug=True):
     app.run_server(debug=debug, port=port, host=host)
