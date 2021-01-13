@@ -371,11 +371,19 @@ def show_hover_text(data):
 )
 def show_hover_text(data):
     try:
-        art_name = data["points"][0]["hovertext"]
-        wna_hover = wna(link = art_name, prop_params="links")
-        hover = wna_hover.article_summary_for_hover()
-        # print(hover, type(hover))
-        text = hover["query"]["pages"][0]["extract"]
+        # print(data)
+        data =  data["points"][0]
+        if "hovertext" not in data.keys():
+            print("hovering on lines")
+            text = ""
+        else:
+            print("hovering on point ", end = "")
+            art_name = data["hovertext"]
+            print(art_name)
+            wna_hover = wna(link = art_name, prop_params="links")
+            hover = wna_hover.article_summary_for_hover(collect_points=False)
+            # print(hover, type(hover))
+            text = hover["query"]["pages"][0]["extract"]
     except:
         text = ""
         pass
