@@ -100,8 +100,8 @@ class wna:
         self.points = points
         print("got points")
 
-    def article_summary_for_hover(self, number_of_lines=2, plot_index=0, display_all_summaries = False, collect_points = False):
-        if collect_points == False: # TODO fix this
+    def article_summary_for_hover(self, number_of_lines=2, plot_index=0, display_all_summaries = False, collect_points = True):
+        if collect_points == True: # TODO fix this
             self.collect_points()
             self.points = self.points[plot_index]
         if display_all_summaries == True:
