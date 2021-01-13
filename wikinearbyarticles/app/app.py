@@ -142,7 +142,7 @@ app.layout = html.Div(
                         # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = forward_points, points_in_one_plot= 15))]
                     ),
                     style={
-                        "width": "48%",
+                        "width": "10%",
                         "font-size": "18px",
                         "letter-spacing": "5px",
                         "font-family": "monospace",
@@ -157,7 +157,37 @@ app.layout = html.Div(
                         # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
                     ),
                     style={
-                        "width": "48%",
+                        "width": "10%",
+                        "font-size": "18px",
+                        "letter-spacing": "5px",
+                        "font-family": "monospace",
+                        "display": "inline-block",
+                        "text-align": "center",
+                    },
+                ),
+                html.Div(
+                    dcc.Dropdown(
+                        id="points-fw",
+                        # ! options will depend upon the link
+                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
+                    ),
+                    style={
+                        "width": "40%",
+                        "font-size": "18px",
+                        "letter-spacing": "5px",
+                        "font-family": "monospace",
+                        "display": "inline-block",
+                        "text-align": "center",
+                    },
+                ),
+                html.Div(
+                    dcc.Dropdown(
+                        id="points-bw",
+                        # ! options will depend upon the link
+                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
+                    ),
+                    style={
+                        "width": "40%",
                         "font-size": "18px",
                         "letter-spacing": "5px",
                         "font-family": "monospace",
@@ -320,6 +350,9 @@ app.layout = html.Div(
         dash.dependencies.Output("forwards", "figure"),
         dash.dependencies.Output("backwards", "figure"),
         dash.dependencies.Output("main-article-summary", "children"),
+        dash.dependencies.Output("points-fw", "options"),
+        dash.dependencies.Output("points-bw", "options"),
+        
     ],
     dash.dependencies.Input("art_link", "value"),
 )
@@ -346,7 +379,7 @@ def update_output(art_link):
         "exsentences": "5",
         "exlimit": "1",
         "explaintext": "1",
-        "formatversion": "2",
+        "formatversion": "2"
     }
 
     R = S.get(url=URL, params=PARAMS)
@@ -354,13 +387,18 @@ def update_output(art_link):
     summary = DATA["query"]["pages"][0]["extract"]
 
     forwards = wna(link=art_link, prop_params="links")
+    fw_points = forwards.return_points()
+    fw_points = [{"label": item, "value": item} for item in fw_points]
     forwards = forwards.plot_points()
     forwards["layout"] = net_layout
 
     backwards = wna(link=art_link, prop_params="linkshere")
+    bw_points = backwards.return_points()
+    bw_points = [{"label": item, "value": item} for item in bw_points]
     backwards = backwards.plot_points(dot_color="#ff3b3b")
+    
 
-    return (forwards, backwards, summary)
+    return (forwards, backwards, summary, fw_points, bw_points)
 
 
 @app.callback(
@@ -422,7 +460,16 @@ def show_hover_text(data):
         pass
     return text
 
-
+# @app.callback(
+#     dash.dependencies.Output("points", "options"),
+#     dash.dependencies.Input("forwards", "hoverData")
+# )
+# def update_hover_dropdown(data):
+#     data = data["points"][0]
+#     art_name = data["hovertext"]
+#     wna_hover = wna(link=art_name, prop_params="links")
+#     points = wna_hover.return_points()
+#     return points
 # @app.callback(
 #     dash.dependencies.Output("forwards", "figure"),
 #     [dash.dependencies.Input("art_link", "value")],

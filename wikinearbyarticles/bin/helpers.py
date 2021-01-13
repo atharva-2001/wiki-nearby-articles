@@ -100,6 +100,11 @@ class wna:
         self.points = points
         print("got points")
 
+    def return_points(self, plot_index = 0):
+        if self.points == []:
+            self.collect_points()
+        return self.points[plot_index]
+
     def article_summary_for_hover(self, number_of_lines=2, plot_index=0, display_all_summaries = False, collect_points = True):
         if collect_points == True: # TODO fix this
             self.collect_points()
@@ -182,7 +187,7 @@ class wna:
                 marker=dict(size=5, color=dot_color, opacity=0.5),
                 mode="markers+text",
                 hovertext=self.points,
-                hoverinfo="text",
+                hoverinfo="text"
             )
         )
 
@@ -228,7 +233,7 @@ class wna:
                 "r": 0,
                 "l": 0,
                 "b": 0,
-            },
+            }
         )
         fig.update_traces(showlegend=False)
         if plot_flag == True:
