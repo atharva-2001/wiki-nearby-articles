@@ -406,6 +406,7 @@ def update_output(art_link):
     dash.dependencies.Input("forwards", "hoverData"),
 )
 def show_hover_text(data):
+    print(data)
     try:
         # print(data)
         data = data["points"][0]
@@ -430,6 +431,35 @@ def show_hover_text(data):
         pass
     return text
 
+@app.callback(
+    dash.dependencies.Output("forwards", "figure"),
+    dash.dependencies.Input("points-fw", "options"),
+)
+def show_hover_text(data):
+    print(data)
+    try:
+        # print(data)
+        data = data["points"][0]
+        if "hovertext" not in data.keys():
+            print("hovering on lines")
+            text = ""
+        else:
+            print("hovering on point ", end="")
+            art_name = data["hovertext"]
+            print(art_name)
+            wna_hover = wna(link=art_name, prop_params="links")
+            hover = wna_hover.article_summary_for_hover(
+                collect_points=False, number_of_lines=8
+            )
+            # print(hover, type(hover))
+            text = hover["query"]["pages"][0]["extract"]
+            if text == "":
+                text = "no summary available"
+            print("got hover data")
+    except:
+        text = ""
+        pass
+    return text
 
 @app.callback(
     dash.dependencies.Output("backward-hover-description", "children"),
