@@ -146,7 +146,7 @@ class wna:
 
             coords = random_points_in_a_sphere(num = len(points), radius = 5) # center is origin 
 
-            self.points["main_section"] = {
+            self.points[self.article_name] = {
                 "center_coords": [[0], [0], [0]],
                 "point_names": points,
                 "coords": coords
@@ -156,15 +156,19 @@ class wna:
         # * searching for its coords
 
         center_coords = []
+        cluster_origin = ""
 
         for key in self.points.keys():
             if key != self.article_name:
                 for name in key["point_names"]:
                     if name == center:
                         idx = key["point_names"].index("name")
-                        center_coords = [key["coords"][0][idx], key["coords"][0][idx], key["coords"][0][idx]]
+                        center_coords = [key["coords"][0][idx], key["coords"][1][idx], key["coords"][2][idx]]
+                        cluster_origin = key
                         break
         
+        # ! update coords of cluster center
+
         S = requests.Session()
         URL = "https://en.wikipedia.org/w/api.php"
 
@@ -190,13 +194,61 @@ class wna:
             for i in range(0, len(points), self.points_in_one_plot)
         ]
 
-        coords = random_points_in_a_sphere(num = len(points), radius = 5) # center is origin 
+        coords = random_points_in_a_sphere(num = len(points), radius = 5, h = center_coords[0], g = center_coords[0], f = center_coords[0]) 
 
         self.points[center] = {
             "center_coords":center_coords, 
+            "cluster_origin": cluster_origin,
             "point_names": points,
             "coords": coords
         }
+
+    def plot(
+        self,
+        dis_to_external_point = 10, # distance between clusters
+        radius=5,
+        plot_flag=False, # whether or not to plot the graph seperately
+        show_lines_with_origin=True,
+        line_color="#5c5c5c",
+        dot_color="#525BCB",
+        plot_index=0
+    ):
+        # * plotting main cluster
+
+        fig = go.Figure()
+
+        # plotting the central point
+        #  ! the cluster center will have its coords updated!
+
+        fig.add_trace(
+            go.Scatter(
+                x = [self.points[self.article_name]["coords"][0]],
+                y = [self.points[self.article_name]["coords"][1]],
+                z = [self.points[self.article_name]["coords"][2]],
+                text = [self.article_name],
+                marker=dict(size=5, color=dot_color, opacity=0.5), # change the marker color of the central marker
+                mode="markers+text",
+                hovertext = self.article_name,
+                hoverinfo = "text" # what did this do?
+            )
+        )
+
+        for cluster_name in self.points.keys():
+            if cluster_name != self.article_name: 
+                fig.add_trace(
+                    go.Scatter(
+                        x = [self.points[cluster_name]["coords"][0]],
+                        y = [self.points[cluster_name]["coords"][1]],
+                        z = [self.points[cluster_name]["coords"][2]],
+                        text = self.points[cluster_name]["point_names"],
+                        marker=dict(size=5, color=dot_color, opacity=0.5), # change the marker color of the central marker
+                        mode="markers+text",
+                        hoverinfo = "text" # what did this do?
+                    )
+                )
+
+
+        
 
             
 
