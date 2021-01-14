@@ -19,6 +19,25 @@ def find_hover_text(str):
 #  @body helpers class doesnt automatically call data, use the class to call hover data for other article names too
 # 
 # 
+def random_points_in_a_sphere(h = 0, g = 0, f = 0, num = 0, radius = 5):
+    coor = [[], [], []]
+    index = 0
+    while True:
+        if index > num - 1:
+            break
+
+        x = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
+        y = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
+        z = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
+
+        if math.sqrt((x-h) ** 2 + (y-g) ** 2 + (z-f) ** 2) <= radius: # checking if the point is in the circle
+            coor[0].append(x)
+            coor[1].append(y)
+            coor[2].append(z)
+            index += 1
+    return coor
+
+
 def spinning_cursor():
   while True:
     for cursor in '\\|/-':
@@ -147,6 +166,9 @@ class wna:
 
     def plot_points(
         self,
+        dis_to_external_point = 10,
+        external_points = [],
+        center = "",
         radius=5,
         plot_flag=False,
         show_lines_with_origin=True,
@@ -160,21 +182,7 @@ class wna:
             plot_index=plot_index, number_of_lines=number_of_lines
         )
 
-        coor = [[], [], []]
-        index = 0
-        while True:
-            if index > len(self.points) - 1:
-                break
-
-            x = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
-            y = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
-            z = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
-
-            if math.sqrt(x ** 2 + y ** 2 + z ** 2) <= radius:
-                coor[0].append(x)
-                coor[1].append(y)
-                coor[2].append(z)
-                index += 1
+        coor = random_points_in_a_sphere(num = len(self.points), radius = 5)
 
         # print(len(coor[0]), len(points))
         fig = go.Figure()
