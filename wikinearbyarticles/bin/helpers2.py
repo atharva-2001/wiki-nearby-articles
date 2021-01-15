@@ -35,6 +35,15 @@ def random_points_in_a_sphere(h = 0, g = 0, f = 0, num = 0, radius = 5):
             index += 1
     return coor
 
+def extend_points(tip = [0,0,0], end = [], distance = 10):
+    '''
+    returns new coordinates of the points to extend
+    in a list
+    the default value of tip is the origin
+    end is also a list 
+    '''
+    
+    
 def get_calls(article_name, number_of_lines=7):
     '''
     returns hover data in raw format
