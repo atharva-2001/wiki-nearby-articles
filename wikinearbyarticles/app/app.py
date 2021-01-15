@@ -11,7 +11,7 @@ import numpy as np
 import requests
 import re
 import json
-from wikinearbyarticles.bin.helpers import wna
+from wikinearbyarticles.bin.helpers2 import wna
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
@@ -341,6 +341,7 @@ app.layout = html.Div(
     ]
 )
 
+
 # art = art_from_origin(prop_params = "linkshere")
 # _, _ = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
 
@@ -352,12 +353,11 @@ app.layout = html.Div(
         dash.dependencies.Output("main-article-summary", "children"),
         dash.dependencies.Output("points-fw", "options"),
         dash.dependencies.Output("points-bw", "options"),
-        
+
     ],
     dash.dependencies.Input("art_link", "value"),
 )
 def update_output(art_link):
-
     # article_name = art_link.split("/")[-1]
     # # print(article_name)
     # art = art_from_origin(prop_params = "links", article_name = article_name)
@@ -387,18 +387,17 @@ def update_output(art_link):
     summary = DATA["query"]["pages"][0]["extract"]
 
     forwards = wna(link=art_link, prop_params="links")
-    fw_points = forwards.return_points()
+    fw_points = forwards.collect_points()
     fw_points = [{"label": item, "value": item} for item in fw_points]
-    forwards = forwards.plot_points()
+    forwards = forwards.plot()
     forwards["layout"] = net_layout
 
     backwards = wna(link=art_link, prop_params="linkshere")
-    bw_points = backwards.return_points()
+    bw_points = backwards.collect_points()
     bw_points = [{"label": item, "value": item} for item in bw_points]
-    backwards = backwards.plot_points(dot_color="#ff3b3b")
-    
+    backwards = backwards.plot(dot_color="#ff3b3b")
 
-    return (forwards, backwards, summary, fw_points, bw_points)
+    return forwards, backwards, summary, fw_points, bw_points
 
 
 @app.callback(
@@ -408,14 +407,14 @@ def update_output(art_link):
 def show_hover_text(data):
     print(data)
     try:
-        # print(data)
+        print(data)
         data = data["points"][0]
-        if "hovertext" not in data.keys():
+        if "text" not in data.keys():
             print("hovering on lines")
             text = ""
         else:
             print("hovering on point ", end="")
-            art_name = data["hovertext"]
+            art_name = data["text"]
             print(art_name)
             wna_hover = wna(link=art_name, prop_params="links")
             hover = wna_hover.article_summary_for_hover(
@@ -431,35 +430,37 @@ def show_hover_text(data):
         pass
     return text
 
-@app.callback(
-    dash.dependencies.Output("forwards", "figure"),
-    dash.dependencies.Input("points-fw", "options"),
-)
-def show_hover_text(data):
-    print(data)
-    try:
-        # print(data)
-        data = data["points"][0]
-        if "hovertext" not in data.keys():
-            print("hovering on lines")
-            text = ""
-        else:
-            print("hovering on point ", end="")
-            art_name = data["hovertext"]
-            print(art_name)
-            wna_hover = wna(link=art_name, prop_params="links")
-            hover = wna_hover.article_summary_for_hover(
-                collect_points=False, number_of_lines=8
-            )
-            # print(hover, type(hover))
-            text = hover["query"]["pages"][0]["extract"]
-            if text == "":
-                text = "no summary available"
-            print("got hover data")
-    except:
-        text = ""
-        pass
-    return text
+
+#
+# @app.callback(
+#     dash.dependencies.Output("forwards", "figure"),
+#     dash.dependencies.Input("points-fw", "options"),
+# )
+# def show_hover_text(data):
+#     print(data)
+#     try:
+#         # print(data)
+#         data = data["points"][0]
+#         if "hovertext" not in data.keys():
+#             print("hovering on lines")
+#             text = ""
+#         else:
+#             print("hovering on point ", end="")
+#             art_name = data["hovertext"]
+#             print(art_name)
+#             wna_hover = wna(link=art_name, prop_params="links")
+#             hover = wna_hover.article_summary_for_hover(
+#                 collect_points=False, number_of_lines=8
+#             )
+#             # print(hover, type(hover))
+#             text = hover["query"]["pages"][0]["extract"]
+#             if text == "":
+#                 text = "no summary available"
+#             print("got hover data")
+#     except:
+#         text = ""
+#         pass
+#     return text
 
 @app.callback(
     dash.dependencies.Output("backward-hover-description", "children"),
@@ -467,16 +468,16 @@ def show_hover_text(data):
 )
 def show_hover_text(data):
     try:
-        # print(data)
+        print(data)
         data = data["points"][0]
-        if "hovertext" not in data.keys():
+        if "text" not in data.keys():
             print("hovering on lines")
             text = ""
         else:
             print("hovering on point ", end="")
-            art_name = data["hovertext"]
+            art_name = data["text"]
             print(art_name)
-            wna_hover = wna(link=art_name, prop_params="links")
+            wna_hover = wna(link=art_name, prop_params="linkshere")
             hover = wna_hover.article_summary_for_hover(
                 collect_points=False, number_of_lines=8
             )
@@ -489,6 +490,7 @@ def show_hover_text(data):
         text = ""
         pass
     return text
+
 
 # @app.callback(
 #     dash.dependencies.Output("points", "options"),
