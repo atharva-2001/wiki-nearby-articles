@@ -118,12 +118,7 @@ class wna:
             self.article_name = link.split("/")[-1]
         self.prop_params = prop_params
         self.points_in_one_plot = points_in_one_shot
-        self.points = {
-            self.article_name: {
-                "name": [self.article_name],
-                "coords": [[0], [0], [0]]
-            }
-        }
+        self.points = {}
 
     def collect_points(self, center="", plot_index=0):
         '''
@@ -174,18 +169,24 @@ class wna:
 
         center_coords = []
         cluster_origin = ""
-        if center != "":
+        if center != "" and center is not None: #pass
+            print("KEYS>>>", self.points.keys())
             for key in self.points.keys():
-                if key != self.article_name:
-                    for name in key["point_names"]:
-                        if name == center:
-                            idx = key["point_names"].index("name")
-                            center_coords = [key["coords"][0][idx], key["coords"][1][idx], key["coords"][2][idx]]
-                            cluster_origin = key
-                            break
+                print("THIS IS THE KEY", key)
+                # if key != self.article_name: # pass
+                for name in self.points[key]["point_names"]:
+                    print("CHECKING CONDITION", name, center)
+                    if name == center:
+                        idx = self.points[key]["point_names"].index(name)
+                        print("CHECKED CONDITION", name, center)
+                        center_coords = [[self.points[key]["coords"][0][idx]], 
+                                        [self.points[key]["coords"][1][idx]], 
+                                        [self.points[key]["coords"][2][idx]]]
+                        cluster_origin = key
+                        break
 
             # ! update coords of cluster center
-            print(center)
+            print("THIS IS CENTER", center, center_coords)
             S = requests.Session()
             URL = "https://en.wikipedia.org/w/api.php"
 
@@ -199,7 +200,7 @@ class wna:
 
             R = S.get(url=URL, params=PARAMS)
             DATA = R.json()
-            print(DATA)
+            # print(DATA)
             PAGES = DATA["query"]["pages"]
             points = []
             for k, v in PAGES.items():
@@ -212,16 +213,30 @@ class wna:
                 for i in range(0, len(points), self.points_in_one_plot)
             ][plot_index]
 
+            print(center_coords)
+
             coords = random_points_in_a_sphere(num=len(points), radius=5, h=center_coords[0], g=center_coords[0],
                                                f=center_coords[0])
 
+
+            print("POINTS AFTER UPDATION...")
             self.points[center] = {
                 "center_coords": center_coords,
                 "cluster_origin": cluster_origin,
                 "point_names": points,
                 "coords": coords
             }
-        return self.points
+        # return self.points
+
+    def return_points(self):
+        '''
+        returns all points except cluster centers
+        '''
+        points = []
+        for key in self.points.keys():
+            points += self.points[key]["point_names"]
+        return points
+
 
     def article_summary_for_hover(self,
                                   number_of_lines=2,

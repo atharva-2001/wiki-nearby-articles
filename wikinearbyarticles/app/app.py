@@ -345,19 +345,19 @@ app.layout = html.Div(
 # art = art_from_origin(prop_params = "linkshere")
 # _, _ = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
 
-
+# TODO: seperate this callback into two, one for each graph
 @app.callback(
     [
         dash.dependencies.Output("forwards", "figure"),
         dash.dependencies.Output("backwards", "figure"),
         dash.dependencies.Output("main-article-summary", "children"),
         dash.dependencies.Output("points-fw", "options"),
-        dash.dependencies.Output("points-bw", "options"),
-
+        dash.dependencies.Output("points-bw", "options")
     ],
-    dash.dependencies.Input("art_link", "value"),
+    [dash.dependencies.Input("art_link", "value"),
+    dash.dependencies.Input("points-fw", "value")]
 )
-def update_output(art_link):
+def update_output(art_link, val_fw):
     # article_name = art_link.split("/")[-1]
     # # print(article_name)
     # art = art_from_origin(prop_params = "links", article_name = article_name)
@@ -381,19 +381,21 @@ def update_output(art_link):
         "explaintext": "1",
         "formatversion": "2"
     }
-
+    print("THIS IS VALUE FORWARDS", val_fw)
     R = S.get(url=URL, params=PARAMS)
     DATA = R.json()
     summary = DATA["query"]["pages"][0]["extract"]
 
     forwards = wna(link=art_link, prop_params="links")
-    fw_points = forwards.collect_points()
+    forwards.collect_points(center=val_fw)
+    fw_points = forwards.return_points()
     fw_points = [{"label": item, "value": item} for item in fw_points]
     forwards = forwards.plot()
     forwards["layout"] = net_layout
 
     backwards = wna(link=art_link, prop_params="linkshere")
-    bw_points = backwards.collect_points()
+    backwards.collect_points()
+    bw_points = backwards.return_points()
     bw_points = [{"label": item, "value": item} for item in bw_points]
     backwards = backwards.plot(dot_color="#ff3b3b")
 
