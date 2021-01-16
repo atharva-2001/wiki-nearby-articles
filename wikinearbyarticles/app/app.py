@@ -15,7 +15,8 @@ from wikinearbyarticles.bin.helpers2 import wna
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
-
+fw_points_global = {}
+bw_points_global = {}
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
@@ -345,7 +346,9 @@ app.layout = html.Div(
 # art = art_from_origin(prop_params = "linkshere")
 # _, _ = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
 
-# TODO: seperate this callback into two, one for each graph
+# TODO: separate this callback into two, one for each graph
+
+# this callback will only work when the article link is changed
 @app.callback(
     [
         dash.dependencies.Output("forwards", "figure"),
@@ -354,10 +357,14 @@ app.layout = html.Div(
         dash.dependencies.Output("points-fw", "options"),
         dash.dependencies.Output("points-bw", "options")
     ],
-    [dash.dependencies.Input("art_link", "value"),
-    dash.dependencies.Input("points-fw", "value")]
+    [
+        dash.dependencies.Input("art_link", "value"),
+        dash.dependencies.Input("points-fw", "value"),
+        dash.dependencies.Input("points-bw", "value"),
+
+    ]
 )
-def update_output(art_link, val_fw):
+def update_output(art_link, val_fw, val_bw):
     # article_name = art_link.split("/")[-1]
     # # print(article_name)
     # art = art_from_origin(prop_params = "links", article_name = article_name)
@@ -366,6 +373,9 @@ def update_output(art_link, val_fw):
 
     # art = art_from_origin(prop_params = "linkshere", article_name = article_name)
     # backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True, dot_color="#ff3b3b")
+
+    global fw_points_global
+    global bw_points_global
 
     # TODO this is a temporary solution, fix it
     title = art_link.split("/")[-1]
@@ -386,18 +396,23 @@ def update_output(art_link, val_fw):
     DATA = R.json()
     summary = DATA["query"]["pages"][0]["extract"]
 
-    forwards = wna(link=art_link, prop_params="links")
+    forwards = wna(link=art_link, prop_params="links", points=fw_points_global)
     forwards.collect_points(center=val_fw)
-    fw_points = forwards.return_points()
+    fw_points = forwards.return_points(drop=True)
     fw_points = [{"label": item, "value": item} for item in fw_points]
+
+    fw_points_global = forwards.return_points(drop=False)
     forwards = forwards.plot()
     forwards["layout"] = net_layout
 
-    backwards = wna(link=art_link, prop_params="linkshere")
-    backwards.collect_points()
-    bw_points = backwards.return_points()
+    backwards = wna(link=art_link, prop_params="linkshere", points=bw_points_global)
+    backwards.collect_points(center=val_bw)
+    bw_points = backwards.return_points(drop=True)
     bw_points = [{"label": item, "value": item} for item in bw_points]
+
+    bw_points_global = backwards.return_points(drop=False)
     backwards = backwards.plot(dot_color="#ff3b3b")
+    backwards["layout"] = net_layout
 
     return forwards, backwards, summary, fw_points, bw_points
 
@@ -433,37 +448,6 @@ def show_hover_text(data):
     return text
 
 
-#
-# @app.callback(
-#     dash.dependencies.Output("forwards", "figure"),
-#     dash.dependencies.Input("points-fw", "options"),
-# )
-# def show_hover_text(data):
-#     print(data)
-#     try:
-#         # print(data)
-#         data = data["points"][0]
-#         if "hovertext" not in data.keys():
-#             print("hovering on lines")
-#             text = ""
-#         else:
-#             print("hovering on point ", end="")
-#             art_name = data["hovertext"]
-#             print(art_name)
-#             wna_hover = wna(link=art_name, prop_params="links")
-#             hover = wna_hover.article_summary_for_hover(
-#                 collect_points=False, number_of_lines=8
-#             )
-#             # print(hover, type(hover))
-#             text = hover["query"]["pages"][0]["extract"]
-#             if text == "":
-#                 text = "no summary available"
-#             print("got hover data")
-#     except:
-#         text = ""
-#         pass
-#     return text
-
 @app.callback(
     dash.dependencies.Output("backward-hover-description", "children"),
     dash.dependencies.Input("backwards", "hoverData"),
@@ -493,25 +477,6 @@ def show_hover_text(data):
         pass
     return text
 
-
-# @app.callback(
-#     dash.dependencies.Output("points", "options"),
-#     dash.dependencies.Input("forwards", "hoverData")
-# )
-# def update_hover_dropdown(data):
-#     data = data["points"][0]
-#     art_name = data["hovertext"]
-#     wna_hover = wna(link=art_name, prop_params="links")
-#     points = wna_hover.return_points()
-#     return points
-# @app.callback(
-#     dash.dependencies.Output("forwards", "figure"),
-#     [dash.dependencies.Input("art_link", "value")],
-#     [State("forwards", "figure")]
-# )
-# def set_layout(value, fig):
-#     fig["layout"] = net_layout
-#     return fig
 
 
 def run(port=8050, host="127.0.0.1", debug=True):

@@ -84,7 +84,8 @@ class wna:
             self,
             link,
             prop_params,
-            points_in_one_shot=15
+            points_in_one_shot=15,
+            points={}
     ):
         '''
         this is the main class
@@ -118,7 +119,10 @@ class wna:
             self.article_name = link.split("/")[-1]
         self.prop_params = prop_params
         self.points_in_one_plot = points_in_one_shot
-        self.points = {}
+        if points != {}:
+            self.points = points
+        else:
+            self.points = {}
 
     def collect_points(self, center="", plot_index=0):
         '''
@@ -159,6 +163,7 @@ class wna:
             coords = random_points_in_a_sphere(num=len(points), radius=5)  # center is origin
 
             self.points[self.article_name] = {
+                "cluster_origin": self.article_name,
                 "center_coords": [[0], [0], [0]],
                 "point_names": points,
                 "coords": coords
@@ -179,7 +184,7 @@ class wna:
                     if name == center:
                         idx = self.points[key]["point_names"].index(name)
                         print("CHECKED CONDITION", name, center)
-                        center_coords = [[self.points[key]["coords"][0][idx]], 
+                        center_coords = [[self.points[key]["coords"][0][idx]],
                                         [self.points[key]["coords"][1][idx]], 
                                         [self.points[key]["coords"][2][idx]]]
                         cluster_origin = key
@@ -218,7 +223,6 @@ class wna:
             coords = random_points_in_a_sphere(num=len(points), radius=5, h=center_coords[0], g=center_coords[0],
                                                f=center_coords[0])
 
-
             print("POINTS AFTER UPDATION...")
             self.points[center] = {
                 "center_coords": center_coords,
@@ -228,14 +232,17 @@ class wna:
             }
         # return self.points
 
-    def return_points(self):
+    def return_points(self, drop=True):
         '''
         returns all points except cluster centers
         '''
-        points = []
-        for key in self.points.keys():
-            points += self.points[key]["point_names"]
-        return points
+        if drop:
+            points = []
+            for key in self.points.keys():
+                points += self.points[key]["point_names"]
+            return points
+        else:
+            return self.points
 
 
     def article_summary_for_hover(self,
@@ -302,23 +309,35 @@ class wna:
         print(self.points)
         print(self.points[self.article_name]["coords"][0])
         print()
-        fig.add_trace(
-            go.Scatter3d(
-                x=[0],
-                y=[0],
-                z=[0],
-                text=[self.article_name],
-                marker=dict(size=5, color=dot_color, opacity=0.5),  # change the marker color of the central marker
-                mode="markers+text",
-                hovertext=self.article_name,
-                hoverinfo="text"  # what did this do?
-            )
-        )
+        # fig.add_trace(
+        #     go.Scatter3d(
+        #         x=[0],
+        #         y=[0],
+        #         z=[0],
+        #         text=[self.article_name],
+        #         marker=dict(size=14, color=dot_color, opacity=0.5),  # change the marker color of the central marker
+        #         mode="markers+text",
+        #         hovertext=self.article_name,
+        #         hoverinfo="text"  # what did this do?
+        #     )
+        # )
 
         # plotting other points
         for cluster_name in self.points.keys():
             # if cluster_name != self.article_name:
+            fig.add_trace(
+                go.Scatter3d(
+                    x=self.points[cluster_name]["center_coords"][0],
+                    y=self.points[cluster_name]["center_coords"][1],
+                    z=self.points[cluster_name]["center_coords"][2],
+                    text=[cluster_name],
+                    marker=dict(size=14, color=dot_color, opacity=0.5),  # change the marker color of the central marker
+                    mode="markers+text",
+                    hoverinfo="text"  # what did this do?
+                )
+            )
             print("plotting other points")
+            print(self.points[cluster_name]["cluster_origin"])
             print(self.points[cluster_name]["coords"][0])
             print(self.points[cluster_name]["point_names"])
             fig.add_trace(
