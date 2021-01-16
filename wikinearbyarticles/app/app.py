@@ -153,42 +153,12 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     dcc.Dropdown(
-                        id="choose-section-backward",
-                        # ! options will depend upon the link
-                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
-                    ),
-                    style={
-                        "width": "10%",
-                        "font-size": "18px",
-                        "letter-spacing": "5px",
-                        "font-family": "monospace",
-                        "display": "inline-block",
-                        "text-align": "center",
-                    },
-                ),
-                html.Div(
-                    dcc.Dropdown(
                         id="points-fw",
                         # ! options will depend upon the link
                         # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
                     ),
                     style={
-                        "width": "40%",
-                        "font-size": "18px",
-                        "letter-spacing": "5px",
-                        "font-family": "monospace",
-                        "display": "inline-block",
-                        "text-align": "center",
-                    },
-                ),
-                html.Div(
-                    dcc.Dropdown(
-                        id="points-bw",
-                        # ! options will depend upon the link
-                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
-                    ),
-                    style={
-                        "width": "40%",
+                        "width": "90%",
                         "font-size": "18px",
                         "letter-spacing": "5px",
                         "font-family": "monospace",
@@ -203,33 +173,14 @@ app.layout = html.Div(
                 html.Div(
                     html.P("article directs to these articles"),
                     style={
-                        "width": "48%",
+                        "width": "100%",
                         "font-size": "18px",
                         "letter-spacing": "5px",
                         "font-family": "monospace",
                         "display": "inline-block",
                         "text-align": "center",
                     },
-                ),
-                html.Div(
-                    html.P(),
-                    style={
-                        "width": "2%",
-                        "display": "inline-block",
-                        "text-align": "center",
-                    },
-                ),
-                html.Div(
-                    html.P("article is directed from these articles"),
-                    style={
-                        "width": "48%",
-                        "font-size": "18px",
-                        "letter-spacing": "5px",
-                        "font-family": "monospace",
-                        "display": "inline-block",
-                        "text-align": "center",
-                    },
-                ),
+                )
             ]
         ),
         html.Div(html.Br()),
@@ -252,7 +203,7 @@ app.layout = html.Div(
                     ),
                     style={
                         "width": "68%",
-                        "height": "800px",
+                        "height": "1000px",
                         "display": "inline-block",
                         "border": "3px #5c5c5c solid",
                         "padding-top": "5px",
@@ -263,7 +214,7 @@ app.layout = html.Div(
                 html.Div(
                     style={
                         "width": "2%",
-                        "height": "800px",
+                        "height": "1000px",
                         "display": "inline-block",
                         "padding-top": "5px",
                         "overflow": "hidden",
@@ -274,16 +225,61 @@ app.layout = html.Div(
                     style={
                         "width": "26%",
                         "font-size": "15.5px",
-                        "height": "800px",
+                        "height": "1000px",
                         "font-family": "monospace",
                         "display": "inline-block",
                         "text-align": "center",
-                        # "margin": "auto",
-                        # "border": "3px #5c5c5c solid",
                         "overflow": "hidden",
-                        # "padding-top": "350px",
-                        # "padding-bottom": "350px",
                         "padding-left": "1px",
+                    },
+                ),
+            ]
+        ),
+        html.Div(
+            [
+                html.Div(
+                    dcc.Dropdown(
+                        id="choose-section-backward",
+                        # ! options will depend upon the link
+                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
+                    ),
+                    style={
+                        "width": "10%",
+                        "font-size": "18px",
+                        "letter-spacing": "5px",
+                        "font-family": "monospace",
+                        "display": "inline-block",
+                        "text-align": "center",
+                    },
+                ),
+                html.Div(
+                    dcc.Dropdown(
+                        id="points-bw",
+                        # ! options will depend upon the link
+                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
+                    ),
+                    style={
+                        "width": "90%",
+                        "font-size": "18px",
+                        "letter-spacing": "5px",
+                        "font-family": "monospace",
+                        "display": "inline-block",
+                        "text-align": "center",
+                    },
+                ),
+            ]
+        ),
+        html.Div(
+            [
+                html.Div(
+                    html.P("article is directed from these articles"),
+                    style={
+                        "width": "100%",
+                        "font-size": "18px",
+                        "letter-spacing": "5px",
+                        "font-family": "monospace",
+                        "display": "inline-block",
+                        "text-align": "center",
                     },
                 ),
             ]
@@ -304,7 +300,7 @@ app.layout = html.Div(
                     ),
                     style={
                         "width": "68%",
-                        "height": "800px",
+                        "height": "1000px",
                         "display": "inline-block",
                         "border": "3px #5c5c5c solid",
                         "padding-top": "5px",
@@ -325,15 +321,12 @@ app.layout = html.Div(
                     style={
                         "width": "26%",
                         "font-size": "15.5px",
-                        "height": "800px",
+                        "height": "1000px",
                         "font-family": "monospace",
                         "display": "inline-block",
                         "text-align": "center",
                         "margin": "auto",
-                        # "border": "3px #5c5c5c solid",
                         "overflow": "hidden",
-                        # "padding-top": "350px",
-                        # "padding-bottom": "350px",
                         "padding-left": "1px",
                     },
                 ),
@@ -342,29 +335,19 @@ app.layout = html.Div(
     ]
 )
 
-
-# art = art_from_origin(prop_params = "linkshere")
-# _, _ = create_random_populated_sphere(radius=1000, points=art, plot_flag=True, show_lines_with_origin=True)
-
-# TODO: separate this callback into two, one for each graph
-
 # this callback will only work when the article link is changed
 @app.callback(
     [
         dash.dependencies.Output("forwards", "figure"),
-        dash.dependencies.Output("backwards", "figure"),
         dash.dependencies.Output("main-article-summary", "children"),
         dash.dependencies.Output("points-fw", "options"),
-        dash.dependencies.Output("points-bw", "options")
     ],
     [
         dash.dependencies.Input("art_link", "value"),
         dash.dependencies.Input("points-fw", "value"),
-        dash.dependencies.Input("points-bw", "value"),
-
-    ]
+    ],
 )
-def update_output(art_link, val_fw, val_bw):
+def update_output(art_link, val_fw):
     # article_name = art_link.split("/")[-1]
     # # print(article_name)
     # art = art_from_origin(prop_params = "links", article_name = article_name)
@@ -375,6 +358,59 @@ def update_output(art_link, val_fw, val_bw):
     # backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True, dot_color="#ff3b3b")
 
     global fw_points_global
+
+    # TODO this is a temporary solution, fix it
+    # TODO this is a temporary solution, fix it
+    title = art_link.split("/")[-1]
+    S = requests.Session()
+    URL = "https://en.wikipedia.org/w/api.php"
+    PARAMS = {
+        "action": "query",
+        "format": "json",
+        "titles": title,
+        "prop": "extracts",
+        "exsentences": "5",
+        "exlimit": "1",
+        "explaintext": "1",
+        "formatversion": "2",
+    }
+    # print("THIS IS VALUE FORWARDS", val_fw)
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+    summary = DATA["query"]["pages"][0]["extract"]
+
+    forwards = wna(link=art_link, prop_params="links", points=fw_points_global)
+    forwards.collect_points(center=val_fw)
+    fw_points = forwards.return_points(drop=True)
+    fw_points = [{"label": item, "value": item} for item in fw_points]
+
+    fw_points_global = forwards.return_points(drop=False)
+    forwards = forwards.plot()
+    forwards["layout"] = net_layout
+
+    return forwards, summary, fw_points
+
+
+@app.callback(
+    [
+        dash.dependencies.Output("backwards", "figure"),
+        dash.dependencies.Output("points-bw", "options"),
+    ],
+    [
+        dash.dependencies.Input("art_link", "value"),
+        dash.dependencies.Input("points-bw", "value"),
+    ],
+)
+def update_output(art_link, val_bw):
+    # article_name = art_link.split("/")[-1]
+    # # print(article_name)
+    # art = art_from_origin(prop_params = "links", article_name = article_name)
+    # # print(art)
+    # forwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True)
+
+    # art = art_from_origin(prop_params = "linkshere", article_name = article_name)
+    # backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True, dot_color="#ff3b3b")
+
     global bw_points_global
 
     # TODO this is a temporary solution, fix it
@@ -389,21 +425,12 @@ def update_output(art_link, val_fw, val_bw):
         "exsentences": "5",
         "exlimit": "1",
         "explaintext": "1",
-        "formatversion": "2"
+        "formatversion": "2",
     }
-    print("THIS IS VALUE FORWARDS", val_fw)
+    # print("THIS IS VALUE FORWARDS", val_fw)
     R = S.get(url=URL, params=PARAMS)
     DATA = R.json()
     summary = DATA["query"]["pages"][0]["extract"]
-
-    forwards = wna(link=art_link, prop_params="links", points=fw_points_global)
-    forwards.collect_points(center=val_fw)
-    fw_points = forwards.return_points(drop=True)
-    fw_points = [{"label": item, "value": item} for item in fw_points]
-
-    fw_points_global = forwards.return_points(drop=False)
-    forwards = forwards.plot()
-    forwards["layout"] = net_layout
 
     backwards = wna(link=art_link, prop_params="linkshere", points=bw_points_global)
     backwards.collect_points(center=val_bw)
@@ -414,7 +441,7 @@ def update_output(art_link, val_fw, val_bw):
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
 
-    return forwards, backwards, summary, fw_points, bw_points
+    return backwards, bw_points
 
 
 @app.callback(
@@ -422,9 +449,9 @@ def update_output(art_link, val_fw, val_bw):
     dash.dependencies.Input("forwards", "hoverData"),
 )
 def show_hover_text(data):
-    print(data)
+    # print(data)
     try:
-        print(data)
+        # print(data)
         data = data["points"][0]
         if "text" not in data.keys():
             print("hovering on lines")
@@ -454,7 +481,7 @@ def show_hover_text(data):
 )
 def show_hover_text(data):
     try:
-        print(data)
+        # print(data)
         data = data["points"][0]
         if "text" not in data.keys():
             print("hovering on lines")
@@ -476,7 +503,6 @@ def show_hover_text(data):
         text = ""
         pass
     return text
-
 
 
 def run(port=8050, host="127.0.0.1", debug=True):
