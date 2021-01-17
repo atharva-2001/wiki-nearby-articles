@@ -92,19 +92,17 @@ class wna:
 
         structure of points
         {
-            "main point": {
-                "name": ["name of main article searched for"]
-                "coords": [[0], [0], [0]]
-            }
-            "main section": {
-                "center coords": [[0], [0], [0]],
-                "names of other points": ["string 1", "string 2"],
+            "article name": {
+                "cluster_origin": "some string, name of the article directly connected before expanding"
+                "center_coords": [[0], [0], [0]],
+                "point_names": ["string 1", "string 2"],
                 "coords": [[x coords llist], [y coords llist], [z coords llist]]
             }
             # other sections will be added like this
             "some article as center": {
-                "center coords": [[x], [y], [z]],
-                "names of other points": ["string 1", "string 2"],
+                "cluster_origin": "some string as before"
+                "center_coords": [[x], [y], [z]],
+                "point_names": ["string 1", "string 2"],
                 "coords": [[x coords list], [y coords list], [z coords llist]]
             }
         }
@@ -312,11 +310,8 @@ class wna:
         fig = go.Figure()
 
         # plotting the central point
-        # print(self.points)
-        # print(self.points[self.article_name]["coords"][0])
 
         for cluster_name in self.points.keys():
-            # if cluster_name != self.article_name:
             fig.add_trace(
                 go.Scatter3d(
                     x=self.points[cluster_name]["center_coords"][0],
@@ -330,10 +325,6 @@ class wna:
                     hoverinfo="text",  # what did this do?
                 )
             )
-            # print("plotting other points")
-            # print(self.points[cluster_name]["cluster_origin"])
-            # print(self.points[cluster_name]["coords"][0])
-            # print(self.points[cluster_name]["point_names"])
             fig.add_trace(
                 go.Scatter3d(
                     x=self.points[cluster_name]["coords"][0],
@@ -373,8 +364,7 @@ class wna:
                         mode="lines",
                         hoverinfo="none",
                     )
-                )
-                # print(self.points[cluster_name]["coords"][0][idx], self.points[cluster_name]["center_coords"][0][0])
+                ),
                 idx += 1
 
         fig.update_layout(

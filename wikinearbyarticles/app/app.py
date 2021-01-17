@@ -122,8 +122,6 @@ app.layout = html.Div(
                         "text-align": "center",
                         # 'padding-left':'10%', 'padding-right':'10%',
                         "border": "none",
-                        # "border-bottom": "2px solid #5e5e5e",
-                        # "background-color": "#1a1a1a",
                         "color": "#5e5e5e",
                         # "padding-bottom": "3px",
                         "padding-left": "10px",
@@ -137,11 +135,23 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
+                    html.P("article directs to these articles"),
+                    style={
+                        "width": "100%",
+                        "font-size": "18px",
+                        "letter-spacing": "5px",
+                        "font-family": "monospace",
+                        "display": "inline-block",
+                        "text-align": "center",
+                    },
+                )
+            ]
+        ),
+        html.Div(
+            [
+                html.Div(
                     dcc.Dropdown(
-                        id="choose-section-forward",
-                        # ! options will depend upon the link
-                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = forward_points, points_in_one_plot= 15))]
-                    ),
+                        id="choose-section-forward",              ),
                     style={
                         "width": "10%",
                         "font-size": "18px",
@@ -154,8 +164,7 @@ app.layout = html.Div(
                 html.Div(
                     dcc.Dropdown(
                         id="points-fw",
-                        # ! options will depend upon the link
-                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
+                        placeholder = "expand articles"
                     ),
                     style={
                         "width": "90%",
@@ -166,21 +175,6 @@ app.layout = html.Div(
                         "text-align": "center",
                     },
                 ),
-            ]
-        ),
-        html.Div(
-            [
-                html.Div(
-                    html.P("article directs to these articles"),
-                    style={
-                        "width": "100%",
-                        "font-size": "18px",
-                        "letter-spacing": "5px",
-                        "font-family": "monospace",
-                        "display": "inline-block",
-                        "text-align": "center",
-                    },
-                )
             ]
         ),
         html.Div(html.Br()),
@@ -235,40 +229,7 @@ app.layout = html.Div(
                 ),
             ]
         ),
-        html.Div(
-            [
-                html.Div(
-                    dcc.Dropdown(
-                        id="choose-section-backward",
-                        # ! options will depend upon the link
-                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
-                    ),
-                    style={
-                        "width": "10%",
-                        "font-size": "18px",
-                        "letter-spacing": "5px",
-                        "font-family": "monospace",
-                        "display": "inline-block",
-                        "text-align": "center",
-                    },
-                ),
-                html.Div(
-                    dcc.Dropdown(
-                        id="points-bw",
-                        # ! options will depend upon the link
-                        # options = [{"label": f"section number: {i}", "value": f"{section}"} for i,section in enumerate(get_points(points = backward_points, points_in_one_plot= 15))]
-                    ),
-                    style={
-                        "width": "90%",
-                        "font-size": "18px",
-                        "letter-spacing": "5px",
-                        "font-family": "monospace",
-                        "display": "inline-block",
-                        "text-align": "center",
-                    },
-                ),
-            ]
-        ),
+
         html.Div(
             [
                 html.Div(
@@ -284,6 +245,38 @@ app.layout = html.Div(
                 ),
             ]
         ),
+        html.Div(
+            [
+                html.Div(
+                    dcc.Dropdown(
+                        id="choose-section-backward",
+                    ),
+                    style={
+                        "width": "10%",
+                        "font-size": "18px",
+                        "letter-spacing": "5px",
+                        "font-family": "monospace",
+                        "display": "inline-block",
+                        "text-align": "center",
+                    },
+                ),
+                html.Div(
+                    dcc.Dropdown(
+                        id="points-bw",
+                        placeholder = "expand articles"
+                    ),
+                    style={
+                        "width": "90%",
+                        "font-size": "18px",
+                        "letter-spacing": "5px",
+                        "font-family": "monospace",
+                        "display": "inline-block",
+                        "text-align": "center",
+                    },
+                ),
+            ]
+        ),
+        
         html.Div(
             [
                 html.Div(
@@ -348,14 +341,6 @@ app.layout = html.Div(
     ],
 )
 def update_output(art_link, val_fw):
-    # article_name = art_link.split("/")[-1]
-    # # print(article_name)
-    # art = art_from_origin(prop_params = "links", article_name = article_name)
-    # # print(art)
-    # forwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True)
-
-    # art = art_from_origin(prop_params = "linkshere", article_name = article_name)
-    # backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True, dot_color="#ff3b3b")
 
     global fw_points_global
 
@@ -402,14 +387,6 @@ def update_output(art_link, val_fw):
     ],
 )
 def update_output(art_link, val_bw):
-    # article_name = art_link.split("/")[-1]
-    # # print(article_name)
-    # art = art_from_origin(prop_params = "links", article_name = article_name)
-    # # print(art)
-    # forwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True)
-
-    # art = art_from_origin(prop_params = "linkshere", article_name = article_name)
-    # backwards = create_random_populated_sphere(radius=100, points=art, plot_flag=False, show_lines_with_origin=True, dot_color="#ff3b3b")
 
     global bw_points_global
 
@@ -450,12 +427,11 @@ def update_output(art_link, val_bw):
 )
 def show_hover_text(data):
     # print(data)
-    try:
-        # print(data)
+    if data is not None:
         data = data["points"][0]
         if "text" not in data.keys():
             print("hovering on lines")
-            text = ""
+            text = "hovering on lines"
         else:
             print("hovering on point ", end="")
             art_name = data["text"]
@@ -469,9 +445,8 @@ def show_hover_text(data):
             if text == "":
                 text = "no summary available"
             print("got hover data")
-    except:
-        text = ""
-        pass
+    else: 
+        text = "Loading..."
     return text
 
 
@@ -480,12 +455,13 @@ def show_hover_text(data):
     dash.dependencies.Input("backwards", "hoverData"),
 )
 def show_hover_text(data):
-    try:
-        # print(data)
+    # try:
+    # print(data)
+    if data is not None:
         data = data["points"][0]
         if "text" not in data.keys():
             print("hovering on lines")
-            text = ""
+            text = "hovering on lines"
         else:
             print("hovering on point ", end="")
             art_name = data["text"]
@@ -499,9 +475,8 @@ def show_hover_text(data):
             if text == "":
                 text = "no summary available"
             print("got hover data")
-    except:
-        text = ""
-        pass
+    else: 
+        text = "Loading..."
     return text
 
 
