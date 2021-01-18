@@ -336,8 +336,6 @@ def update_output(art_link, val_fw):
 
     global fw_points_global
 
-    # TODO this is a temporary solution, fix it
-    # TODO this is a temporary solution, fix it
     title = art_link.split("/")[-1]
     S = requests.Session()
     URL = "https://en.wikipedia.org/w/api.php"
@@ -381,8 +379,6 @@ def update_output(art_link, val_fw):
 def update_output(art_link, val_bw):
 
     global bw_points_global
-
-    # TODO this is a temporary solution, fix it
     title = art_link.split("/")[-1]
     S = requests.Session()
     URL = "https://en.wikipedia.org/w/api.php"

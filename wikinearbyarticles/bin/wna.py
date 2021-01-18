@@ -19,13 +19,14 @@ def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
     """
     coor = [[], [], []]
     index = 0
+    print("finding random points...")
     while True:
         if index > num - 1:
             break
 
-        x = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
-        y = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
-        z = (-1) ** np.random.randint(5, size=1)[0] * radius * np.random.rand(1)[0]
+        x = np.round(np.random.uniform(h+radius,h-radius, (1,))[0], 3)
+        y = np.round(np.random.uniform(g+radius,g-radius, (1,))[0], 3)
+        z = np.round(np.random.uniform(f+radius,f-radius, (1,))[0], 3)
 
         if (
             math.sqrt((x - h) ** 2 + (y - g) ** 2 + (z - f) ** 2) <= radius
@@ -38,13 +39,19 @@ def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
     return coor
 
 
-# def extend_points(tip=[0, 0, 0], end=[], distance=10):
-#     '''
-#     returns new coordinates of the points to extend
-#     in a list
-#     the default value of tip is the origin
-#     end is also a list
-#     '''
+def extend_points(tip=[[0], [0], [0]], end=[[0], [0], [0]], factor=2):
+    '''
+    returns new coordinates of the points to extend
+    in a list
+    the default value of tip is the origin
+    end is also a list
+    '''
+    print("extending coords...")
+    xnew = factor * (end[0][0] - tip[0][0]) + tip[0][0]
+    ynew = factor * (end[1][0] - tip[1][0]) + tip[1][0]
+    znew = factor * (end[2][0] - tip[2][0]) + tip[2][0]
+
+    return [[xnew], [ynew], [znew]]
 
 
 def find_hover_text(str):
@@ -170,11 +177,11 @@ class wna:
 
         center_coords = []
         cluster_origin = ""
+        if_break = False
         if center != "" and center is not None:
             # print("KEYS>>>", self.points.keys())
             for key in self.points.keys():
                 print("THIS IS THE KEY", key)
-                # if key != self.article_name:
                 for name in self.points[key]["point_names"]:
                     print("CHECKING CONDITION", name, center)
                     if name == center:
@@ -183,10 +190,18 @@ class wna:
                         center_coords = [
                             [self.points[key]["coords"][0][idx]],
                             [self.points[key]["coords"][1][idx]],
-                            [self.points[key]["coords"][2][idx]],
+                            [self.points[key]["coords"][2][idx]]
+                        ]
+                        cluster_origin_coords = [
+                            [self.points[key]["center_coords"][0][0]],
+                            [self.points[key]["center_coords"][1][0]],
+                            [self.points[key]["center_coords"][2][0]]
                         ]
                         cluster_origin = key
+                        if_break= True
                         break
+                if if_break:
+                    break
 
             # ! update coords of cluster center
             # print("THIS IS CENTER", center, center_coords)
@@ -208,7 +223,6 @@ class wna:
             points = []
             for k, v in PAGES.items():
                 for l in v[self.prop_params]:
-                    # print(f"appending {l['title']} to lst ")
                     points.append(l["title"])
 
             points = [
@@ -217,13 +231,13 @@ class wna:
             ][plot_index]
 
             # print(center_coords)
-
+            center_coords = extend_points(tip = cluster_origin_coords, end = center_coords, factor=4.5)
             coords = random_points_in_a_sphere(
                 num=len(points),
                 radius=5,
-                h=center_coords[0],
-                g=center_coords[0],
-                f=center_coords[0],
+                h=center_coords[0][0],
+                g=center_coords[1][0],
+                f=center_coords[2][0],
             )
 
             # print("POINTS AFTER UPDATION...")
@@ -255,7 +269,7 @@ class wna:
         collect_points=True,
     ):
 
-        if collect_points:  # TODO fix this
+        if collect_points:
             self.collect_points()
             self.points = self.points[plot_index]
         if display_all_summaries:
