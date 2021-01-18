@@ -1,16 +1,8 @@
-from logging import PlaceHolder
 import dash
-from dash.dependencies import State
-import dash_html_components as html
 import dash_core_components as dcc
-import dash_bootstrap_components as dbc
-import plotly.express as px
-import plotly.graph_objects as go
-import math
-import numpy as np
+import dash_html_components as html
 import requests
-import re
-import json
+
 from wikinearbyarticles.bin.helpers2 import wna
 
 # TODO add animations

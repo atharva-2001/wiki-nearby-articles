@@ -1,12 +1,10 @@
-from numpy.core.arrayprint import set_string_function
-import requests
-import re
 import math
+import re
+import sys
+
 import numpy as np
 import plotly.graph_objects as go
-from time import sleep
-import sys
-import os
+import requests
 
 
 def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
