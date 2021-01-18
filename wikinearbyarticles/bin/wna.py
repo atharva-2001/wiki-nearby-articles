@@ -89,7 +89,7 @@ def get_calls(article_name, number_of_lines=7):
 
 
 class wna:
-    def __init__(self, link, prop_params, points_in_one_shot=15, points={}):
+    def __init__(self, link, prop_params, points_in_one_shot=36, points={}):
         """
         this is the main class
         link can have the website link and the article name as well
@@ -134,7 +134,7 @@ class wna:
         else center will be the name of the article which has to be expanded.
 
         """
-        if "main section" not in self.points.keys():
+        if self.article_name not in self.points.keys():
             # print("main section")
             S = requests.Session()
             URL = "https://en.wikipedia.org/w/api.php"
@@ -197,8 +197,14 @@ class wna:
                             [self.points[key]["center_coords"][1][0]],
                             [self.points[key]["center_coords"][2][0]]
                         ]
+                        center_coords = extend_points(tip=cluster_origin_coords, end=center_coords, factor=4.5 )
+
+                        self.points[key]["coords"][0][idx] = center_coords[0][0]
+                        self.points[key]["coords"][1][idx] = center_coords[1][0]
+                        self.points[key]["coords"][2][idx] = center_coords[2][0]
+
                         cluster_origin = key
-                        if_break= True
+                        if_break = True
                         break
                 if if_break:
                     break
@@ -225,13 +231,13 @@ class wna:
                 for l in v[self.prop_params]:
                     points.append(l["title"])
 
+
             points = [
                 points[i : i + self.points_in_one_plot]
                 for i in range(0, len(points), self.points_in_one_plot)
             ][plot_index]
 
             # print(center_coords)
-            center_coords = extend_points(tip = cluster_origin_coords, end = center_coords, factor=4.5)
             coords = random_points_in_a_sphere(
                 num=len(points),
                 radius=5,
@@ -342,7 +348,7 @@ class wna:
                     x=self.points[cluster_name]["coords"][0],
                     y=self.points[cluster_name]["coords"][1],
                     z=self.points[cluster_name]["coords"][2],
-                    text=self.points[cluster_name]["point_names"],
+                    hovertext=self.points[cluster_name]["point_names"],
                     marker=dict(size=5, color=dot_color, opacity=0.5),
                     # change the marker color of the central marker
                     mode="markers+text",
@@ -369,9 +375,7 @@ class wna:
                         ],
                         marker=dict(
                             size=0.1,
-                            color=line_color,
-                            # colorscale='Viridis',
-                            # opacity=1
+                            color=line_color
                         ),
                         mode="lines",
                         hoverinfo="none",

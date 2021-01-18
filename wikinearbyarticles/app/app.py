@@ -26,7 +26,7 @@ net_layout = {
         # "hover"
     },
     # template = "plotly_dark",
-    "font": {"family": "monospace", "size": 18},
+    "font": {"family": "monospace", "size": 15},
     "scene": {
         "xaxis": {"visible": False, "showticklabels": False},
         "yaxis": {"visible": False, "showticklabels": False},
@@ -414,15 +414,15 @@ def update_output(art_link, val_bw):
     dash.dependencies.Input("forwards", "hoverData"),
 )
 def show_hover_text(data):
-    # print(data)
+    print(data)
     if data is not None:
         data = data["points"][0]
-        if "text" not in data.keys():
+        if "hovertext" not in data.keys():
             print("hovering on lines")
-            text = "hovering on lines"
+            text = "hover on points to see article summary"
         else:
             print("hovering on point ", end="")
-            art_name = data["text"]
+            art_name = data["hovertext"]
             print(art_name)
             wna_hover = wna(link=art_name, prop_params="links")
             hover = wna_hover.article_summary_for_hover(
@@ -447,12 +447,12 @@ def show_hover_text(data):
     # print(data)
     if data is not None:
         data = data["points"][0]
-        if "text" not in data.keys():
+        if "hovertext" not in data.keys():
             print("hovering on lines")
-            text = "hovering on lines"
+            text = "hover on points to see article summary"
         else:
             print("hovering on point ", end="")
-            art_name = data["text"]
+            art_name = data["hovertext"]
             print(art_name)
             wna_hover = wna(link=art_name, prop_params="linkshere")
             hover = wna_hover.article_summary_for_hover(
