@@ -1,2 +1,2 @@
-from .bin import helpers
+from .bin import wna
 from .app import run

@@ -3,7 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import requests
 
-from wikinearbyarticles.bin.helpers2 import wna
+from wikinearbyarticles.bin.wna import wna
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
