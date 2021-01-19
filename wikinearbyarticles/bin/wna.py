@@ -237,7 +237,7 @@ class wna:
                 for i in range(0, len(points), self.points_in_one_plot)
             ][plot_index]
 
-            # print(center_coords)
+            print(center_coords)
             coords = random_points_in_a_sphere(
                 num=len(points),
                 radius=5,

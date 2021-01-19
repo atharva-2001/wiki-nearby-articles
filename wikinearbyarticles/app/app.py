@@ -1,5 +1,6 @@
 import dash
 import dash_core_components as dcc
+from dash.dependencies import Input, State, Output
 import dash_html_components as html
 import requests
 
@@ -9,7 +10,7 @@ from wikinearbyarticles.bin.wna import wna
 # TODO between graphs as they are updated, extending graphs
 fw_points_global = {}
 bw_points_global = {}
-
+art_link = ""
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
 app = dash.Dash(
@@ -77,6 +78,7 @@ app.layout = html.Div(
         ),
         html.Div(
             [
+                html.Div(id="target"),
                 dcc.Input(
                     id="art_link",
                     className="text_input",
@@ -98,6 +100,7 @@ app.layout = html.Div(
                         "padding-bottom": "3px",
                     },
                 ),
+                html.Button(id='submit', type='submit', children='ok')
             ]
         ),
         html.Div(
@@ -143,7 +146,7 @@ app.layout = html.Div(
             [
                 html.Div(
                     dcc.Dropdown(
-                        id="choose-section-forward",              ),
+                        id="choose-section-forward", ),
                     style={
                         "width": "10%",
                         "font-size": "18px",
@@ -156,7 +159,7 @@ app.layout = html.Div(
                 html.Div(
                     dcc.Dropdown(
                         id="points-fw",
-                        placeholder = "expand articles"
+                        placeholder="expand articles"
                     ),
                     style={
                         "width": "90%",
@@ -255,7 +258,7 @@ app.layout = html.Div(
                 html.Div(
                     dcc.Dropdown(
                         id="points-bw",
-                        placeholder = "expand articles"
+                        placeholder="expand articles"
                     ),
                     style={
                         "width": "90%",
@@ -268,7 +271,7 @@ app.layout = html.Div(
                 ),
             ]
         ),
-        
+
         html.Div(
             [
                 html.Div(
@@ -320,21 +323,34 @@ app.layout = html.Div(
     ]
 )
 
+
 # this callback will only work when the article link is changed
 @app.callback(
     [
         dash.dependencies.Output("forwards", "figure"),
         dash.dependencies.Output("main-article-summary", "children"),
-        dash.dependencies.Output("points-fw", "options"),
+        dash.dependencies.Output("points-fw", "options")
+
     ],
     [
-        dash.dependencies.Input("art_link", "value"),
-        dash.dependencies.Input("points-fw", "value"),
+        dash.dependencies.Input("submit", "n_clicks"),
+        dash.dependencies.Input("points-fw", "value")
     ],
-)
-def update_output(art_link, val_fw):
+    [dash.dependencies.State("art_link", "value")]
 
+)
+def update_output(clicks, val_fw, link):
+    global art_link
     global fw_points_global
+    global bw_points_global
+
+    print(fw_points_global)
+    print()
+    print(bw_points_global)
+    if art_link != link:
+        fw_points_global = {}
+        bw_points_global = {}
+        art_link = link
 
     title = art_link.split("/")[-1]
     S = requests.Session()
@@ -349,7 +365,6 @@ def update_output(art_link, val_fw):
         "explaintext": "1",
         "formatversion": "2",
     }
-    # print("THIS IS VALUE FORWARDS", val_fw)
     R = S.get(url=URL, params=PARAMS)
     DATA = R.json()
     summary = DATA["query"]["pages"][0]["extract"]
@@ -362,6 +377,9 @@ def update_output(art_link, val_fw):
     fw_points_global = forwards.return_points(drop=False)
     forwards = forwards.plot()
     forwards["layout"] = net_layout
+    print(fw_points_global)
+    print()
+    print(bw_points_global)
 
     return forwards, summary, fw_points
 
@@ -372,31 +390,25 @@ def update_output(art_link, val_fw):
         dash.dependencies.Output("points-bw", "options"),
     ],
     [
-        dash.dependencies.Input("art_link", "value"),
+        dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-bw", "value"),
     ],
+    [
+        dash.dependencies.State("art_link", "value")
+    ]
 )
-def update_output(art_link, val_bw):
-
+def update_output(clicks, val_bw, link):
+    global art_link
+    global fw_points_global
     global bw_points_global
-    title = art_link.split("/")[-1]
-    S = requests.Session()
-    URL = "https://en.wikipedia.org/w/api.php"
-    PARAMS = {
-        "action": "query",
-        "format": "json",
-        "titles": title,
-        "prop": "extracts",
-        "exsentences": "5",
-        "exlimit": "1",
-        "explaintext": "1",
-        "formatversion": "2",
-    }
-    # print("THIS IS VALUE FORWARDS", val_fw)
-    R = S.get(url=URL, params=PARAMS)
-    DATA = R.json()
-    summary = DATA["query"]["pages"][0]["extract"]
 
+    print(fw_points_global)
+    print()
+    print(bw_points_global)
+    if art_link != link:
+        fw_points_global = {}
+        bw_points_global = {}
+        art_link = link
     backwards = wna(link=art_link, prop_params="linkshere", points=bw_points_global)
     backwards.collect_points(center=val_bw)
     bw_points = backwards.return_points(drop=True)
@@ -405,6 +417,9 @@ def update_output(art_link, val_bw):
     bw_points_global = backwards.return_points(drop=False)
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
+    print(fw_points_global)
+    print()
+    print(bw_points_global)
 
     return backwards, bw_points
 
@@ -433,7 +448,7 @@ def show_hover_text(data):
             if text == "":
                 text = "no summary available"
             print("got hover data")
-    else: 
+    else:
         text = "Loading..."
     return text
 
@@ -443,8 +458,6 @@ def show_hover_text(data):
     dash.dependencies.Input("backwards", "hoverData"),
 )
 def show_hover_text(data):
-    # try:
-    # print(data)
     if data is not None:
         data = data["points"][0]
         if "hovertext" not in data.keys():
@@ -463,12 +476,12 @@ def show_hover_text(data):
             if text == "":
                 text = "no summary available"
             print("got hover data")
-    else: 
+    else:
         text = "Loading..."
     return text
 
 
-def run(port=8050, host="127.0.0.1", debug=True):
+def run(port=3004, host="127.0.0.1", debug=True):
     app.run_server(debug=debug, port=port, host=host)
 
 
