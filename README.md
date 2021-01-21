@@ -2,8 +2,9 @@
 
 <!-- ![](wikinearbyarticles\bin\gifs\logo.png) -->
 
-![GitHub last commit](https://img.shields.io/github/last-commit/atharva-2001/wiki-nearby-articles) ![GitHub](https://img.shields.io/github/license/atharva-2001/wiki-nearby-articles) ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/atharva-2001/wiki-nearby-articles) ![GitHub Repo stars](https://img.shields.io/github/stars/atharva-2001/wiki-nearby-articles)
-
+<p align = "center">
+<a href=""><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/atharva-2001/wiki-nearby-articles?style=flat-square"></a> <a href=""><img alt="GitHub License" src="https://img.shields.io/github/license/atharva-2001/wiki-nearby-articles?style=flat-square"></a> <a href=""><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/atharva-2001/wiki-nearby-articles?style=flat-square"></a> <a href=""><img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/y/atharva-2001/wiki-nearby-articles?style=flat-square"></a> <a href=""><img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/atharva-2001/wiki-nearby-articles?style=flat-square"></a>
+</p>
 
 This is a dash app that shows on localhost.
 
