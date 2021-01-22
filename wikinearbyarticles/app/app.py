@@ -2,6 +2,7 @@ import dash
 import dash_core_components as dcc
 from dash.dependencies import Input, State, Output
 import dash_html_components as html
+from dash_html_components.Div import Div
 import requests
 
 from wikinearbyarticles.bin.wna import wna
@@ -76,33 +77,35 @@ app.layout = html.Div(
                 "padding-bottom": "3px",
             },
         ),
-        html.Div(
-            [
-                html.Div(id="target"),
-                dcc.Input(
-                    id="art_link",
-                    className="text_input",
-                    # placeholder = "enter wikipedia article link",
-                    value="https://en.wikipedia.org/wiki/MissingNo.",
-                    style={
-                        "font-size": "18px",
-                        "fontFamily": "monospace",
-                        "margin": "0  auto",
-                        "display": "center",
-                        "width": "100%",
-                        "text-align": "center",
-                        "text-spacing": "1px",
-                        # 'padding-left':'10%', 'padding-right':'10%',
-                        "border": "none",
-                        "border-bottom": "0.5px solid #5c5c5c",
-                        # "background-color": "#1a1a1a",
-                        "color": "#525252",
-                        "padding-bottom": "3px",
-                    },
-                ),
-                html.Button(id='submit', type='submit', children='ok')
-            ]
-        ),
+        html.Div([
+                    html.Div(id="target"),
+                    dcc.Input(
+                        id="art_link",
+                        className="text_input",
+                        # placeholder = "enter wikipedia article link",
+                        value="https://en.wikipedia.org/wiki/MissingNo.",
+                        style={
+                            "font-size": "18px",
+                            "fontFamily": "monospace",
+                            # "margin": "0  auto",
+                            # "display": "center",
+                            "width": "95%",
+                            "text-align": "center",
+                            "text-spacing": "1px",
+                            # 'padding-left':'10%', 'padding-right':'10%',
+                            "border": "none",
+                            "border-bottom": "0.5px solid #5c5c5c",
+                            # "background-color": "#1a1a1a",
+                            "color": "#525252",
+                            "padding-bottom": "3px",
+                        }
+                    ),
+                    html.Button(id='submit', type='submit', children='ok',
+                    style = {
+                        "display": "inline-block",
+                        "width": "5%"
+                    })
+            ]),
         html.Div(
             [
                 html.Div(
