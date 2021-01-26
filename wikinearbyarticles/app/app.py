@@ -12,6 +12,9 @@ from wikinearbyarticles.bin.wna import wna
 fw_points_global = {}
 bw_points_global = {}
 art_link = ""
+bw_dropdown_value = ""
+fw_dropdown_value = ""
+
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
 app = dash.Dash(
@@ -77,35 +80,38 @@ app.layout = html.Div(
                 "padding-bottom": "3px",
             },
         ),
-        html.Div([
-                    html.Div(id="target"),
-                    dcc.Input(
-                        id="art_link",
-                        className="text_input",
-                        # placeholder = "enter wikipedia article link",
-                        value="https://en.wikipedia.org/wiki/MissingNo.",
-                        style={
-                            "font-size": "18px",
-                            "fontFamily": "monospace",
-                            # "margin": "0  auto",
-                            # "display": "center",
-                            "width": "95%",
-                            "text-align": "center",
-                            "text-spacing": "1px",
-                            # 'padding-left':'10%', 'padding-right':'10%',
-                            "border": "none",
-                            "border-bottom": "0.5px solid #5c5c5c",
-                            # "background-color": "#1a1a1a",
-                            "color": "#525252",
-                            "padding-bottom": "3px",
-                        }
-                    ),
-                    html.Button(id='submit', type='submit', children='ok',
-                    style = {
-                        "display": "inline-block",
-                        "width": "5%"
-                    })
-            ]),
+        html.Div(
+            [
+                html.Div(id="target"),
+                dcc.Input(
+                    id="art_link",
+                    className="text_input",
+                    # placeholder = "enter wikipedia article link",
+                    value="https://en.wikipedia.org/wiki/MissingNo.",
+                    style={
+                        "font-size": "18px",
+                        "fontFamily": "monospace",
+                        # "margin": "0  auto",
+                        # "display": "center",
+                        "width": "95%",
+                        "text-align": "center",
+                        "text-spacing": "1px",
+                        # 'padding-left':'10%', 'padding-right':'10%',
+                        "border": "none",
+                        "border-bottom": "0.5px solid #5c5c5c",
+                        # "background-color": "#1a1a1a",
+                        "color": "#525252",
+                        "padding-bottom": "3px",
+                    },
+                ),
+                html.Button(
+                    id="submit",
+                    type="submit",
+                    children="ok",
+                    style={"display": "inline-block", "width": "5%"},
+                ),
+            ]
+        ),
         html.Div(
             [
                 html.Div(
@@ -149,7 +155,8 @@ app.layout = html.Div(
             [
                 html.Div(
                     dcc.Dropdown(
-                        id="choose-section-forward", ),
+                        id="choose-section-forward",
+                    ),
                     style={
                         "width": "10%",
                         "font-size": "18px",
@@ -160,10 +167,7 @@ app.layout = html.Div(
                     },
                 ),
                 html.Div(
-                    dcc.Dropdown(
-                        id="points-fw",
-                        placeholder="expand articles"
-                    ),
+                    dcc.Dropdown(id="points-fw", placeholder="expand articles"),
                     style={
                         "width": "90%",
                         "font-size": "18px",
@@ -227,7 +231,6 @@ app.layout = html.Div(
                 ),
             ]
         ),
-
         html.Div(
             [
                 html.Div(
@@ -259,10 +262,7 @@ app.layout = html.Div(
                     },
                 ),
                 html.Div(
-                    dcc.Dropdown(
-                        id="points-bw",
-                        placeholder="expand articles"
-                    ),
+                    dcc.Dropdown(id="points-bw", placeholder="expand articles"),
                     style={
                         "width": "90%",
                         "font-size": "18px",
@@ -274,7 +274,6 @@ app.layout = html.Div(
                 ),
             ]
         ),
-
         html.Div(
             [
                 html.Div(
@@ -332,28 +331,32 @@ app.layout = html.Div(
     [
         dash.dependencies.Output("forwards", "figure"),
         dash.dependencies.Output("main-article-summary", "children"),
-        dash.dependencies.Output("points-fw", "options")
-
+        dash.dependencies.Output("points-fw", "options"),
     ],
     [
         dash.dependencies.Input("submit", "n_clicks"),
-        dash.dependencies.Input("points-fw", "value")
+        dash.dependencies.Input("points-fw", "value"),
     ],
-    [dash.dependencies.State("art_link", "value")]
-
+    [dash.dependencies.State("art_link", "value")],
 )
 def update_output(clicks, val_fw, link):
     global art_link
     global fw_points_global
     global bw_points_global
+    global fw_dropdown_value
 
+    fw_dropdown_value = val_fw
+
+    print("printing points before updating the forwards graph")
     print(fw_points_global)
     print()
     print(bw_points_global)
+
     if art_link != link:
         fw_points_global = {}
         bw_points_global = {}
         art_link = link
+        fw_dropdown_value = None
 
     title = art_link.split("/")[-1]
     S = requests.Session()
@@ -373,13 +376,14 @@ def update_output(clicks, val_fw, link):
     summary = DATA["query"]["pages"][0]["extract"]
 
     forwards = wna(link=art_link, prop_params="links", points=fw_points_global)
-    forwards.collect_points(center=val_fw)
+    forwards.collect_points(center=fw_dropdown_value)
     fw_points = forwards.return_points(drop=True)
     fw_points = [{"label": item, "value": item} for item in fw_points]
 
     fw_points_global = forwards.return_points(drop=False)
     forwards = forwards.plot()
     forwards["layout"] = net_layout
+    print("printing points after updating the forwards graph")
     print(fw_points_global)
     print()
     print(bw_points_global)
@@ -396,15 +400,16 @@ def update_output(clicks, val_fw, link):
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-bw", "value"),
     ],
-    [
-        dash.dependencies.State("art_link", "value")
-    ]
+    [dash.dependencies.State("art_link", "value")],
 )
 def update_output(clicks, val_bw, link):
     global art_link
     global fw_points_global
     global bw_points_global
+    global bw_dropdown_value
+    bw_dropdown_value = val_bw
 
+    print("printing points before updating the backwards graph")
     print(fw_points_global)
     print()
     print(bw_points_global)
@@ -412,14 +417,18 @@ def update_output(clicks, val_bw, link):
         fw_points_global = {}
         bw_points_global = {}
         art_link = link
+        bw_dropdown_value = None
+
     backwards = wna(link=art_link, prop_params="linkshere", points=bw_points_global)
-    backwards.collect_points(center=val_bw)
+    backwards.collect_points(center=bw_dropdown_value)
     bw_points = backwards.return_points(drop=True)
     bw_points = [{"label": item, "value": item} for item in bw_points]
 
     bw_points_global = backwards.return_points(drop=False)
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
+
+    print("printing points after updating the backwards graph")
     print(fw_points_global)
     print()
     print(bw_points_global)
@@ -432,7 +441,7 @@ def update_output(clicks, val_bw, link):
     dash.dependencies.Input("forwards", "hoverData"),
 )
 def show_hover_text(data):
-    print(data)
+    # print(data)
     if data is not None:
         data = data["points"][0]
         if "hovertext" not in data.keys():

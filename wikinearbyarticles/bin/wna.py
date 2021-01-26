@@ -24,9 +24,9 @@ def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
         if index > num - 1:
             break
 
-        x = np.round(np.random.uniform(h+radius,h-radius, (1,))[0], 3)
-        y = np.round(np.random.uniform(g+radius,g-radius, (1,))[0], 3)
-        z = np.round(np.random.uniform(f+radius,f-radius, (1,))[0], 3)
+        x = np.round(np.random.uniform(h + radius, h - radius, (1,))[0], 3)
+        y = np.round(np.random.uniform(g + radius, g - radius, (1,))[0], 3)
+        z = np.round(np.random.uniform(f + radius, f - radius, (1,))[0], 3)
 
         if (
             math.sqrt((x - h) ** 2 + (y - g) ** 2 + (z - f) ** 2) <= radius
@@ -40,12 +40,12 @@ def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
 
 
 def extend_points(tip=[[0], [0], [0]], end=[[0], [0], [0]], factor=2):
-    '''
+    """
     returns new coordinates of the points to extend
     in a list
     the default value of tip is the origin
     end is also a list
-    '''
+    """
     print("extending coords...")
     xnew = factor * (end[0][0] - tip[0][0]) + tip[0][0]
     ynew = factor * (end[1][0] - tip[1][0]) + tip[1][0]
@@ -120,6 +120,7 @@ class wna:
             self.article_name = link.split("/")[-1]
         self.prop_params = prop_params
         self.points_in_one_plot = points_in_one_shot
+        # if the link is updated, the points sent as arguments are already empty distionaries
         if points != {}:
             self.points = points
         else:
@@ -190,14 +191,16 @@ class wna:
                         center_coords = [
                             [self.points[key]["coords"][0][idx]],
                             [self.points[key]["coords"][1][idx]],
-                            [self.points[key]["coords"][2][idx]]
+                            [self.points[key]["coords"][2][idx]],
                         ]
                         cluster_origin_coords = [
                             [self.points[key]["center_coords"][0][0]],
                             [self.points[key]["center_coords"][1][0]],
-                            [self.points[key]["center_coords"][2][0]]
+                            [self.points[key]["center_coords"][2][0]],
                         ]
-                        center_coords = extend_points(tip=cluster_origin_coords, end=center_coords, factor=4.5 )
+                        center_coords = extend_points(
+                            tip=cluster_origin_coords, end=center_coords, factor=4.5
+                        )
 
                         self.points[key]["coords"][0][idx] = center_coords[0][0]
                         self.points[key]["coords"][1][idx] = center_coords[1][0]
@@ -230,7 +233,6 @@ class wna:
             for k, v in PAGES.items():
                 for l in v[self.prop_params]:
                     points.append(l["title"])
-
 
             points = [
                 points[i : i + self.points_in_one_plot]
@@ -373,10 +375,7 @@ class wna:
                             self.points[cluster_name]["coords"][2][idx],
                             self.points[cluster_name]["center_coords"][2][0],
                         ],
-                        marker=dict(
-                            size=0.1,
-                            color=line_color
-                        ),
+                        marker=dict(size=0.1, color=line_color),
                         mode="lines",
                         hoverinfo="none",
                     )
