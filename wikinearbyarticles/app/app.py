@@ -493,8 +493,8 @@ def show_hover_text(data):
     return text
 
 
-def run(port=3004, host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, port=port, host=host)
+def run(host="127.0.0.1", debug=True):
+    app.run_server(debug=debug, host=host)
 
 
 if __name__ == "__main__":
