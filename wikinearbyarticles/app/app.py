@@ -1,3 +1,4 @@
+import flask
 import dash
 import dash_core_components as dcc
 from dash.dependencies import Input, State, Output
@@ -16,12 +17,14 @@ bw_dropdown_value = ""
 fw_dropdown_value = ""
 
 external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
-
+server = flask.Flask(__name__)
 app = dash.Dash(
     __name__,
     # external_stylesheets=[dbc.themes.DARKLY]
     external_stylesheets=external_stylesheets,
+    server=server
 )
+
 server = app.server
 net_layout = {
     "height": 1200,
