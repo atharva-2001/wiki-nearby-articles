@@ -22,7 +22,7 @@ app = dash.Dash(
     # external_stylesheets=[dbc.themes.DARKLY]
     external_stylesheets=external_stylesheets,
 )
-
+server = app.server
 net_layout = {
     "height": 1200,
     "width": 800,
