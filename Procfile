@@ -1,1 +1,1 @@
-web: gunicorn --chdir wikinearbyarticles.app.app:server
+web: gunicorn wikinearbyarticles.app.app:server
