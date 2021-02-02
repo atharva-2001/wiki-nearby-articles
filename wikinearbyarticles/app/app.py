@@ -55,7 +55,7 @@ app.layout = html.Div(
                 "wiki nearby articles",
                 style={
                     "font-size": "72px",
-                    "fontFamily": "monospace",
+                    # "fontFamily": "monospace",
                     "letter-spacing": "5px",
                     "text-align": "center",
                     "font-weight": "light",
