@@ -312,7 +312,7 @@ class wna:
         radius=5,
         plot_flag=False,  # whether or not to plot the graph separately
         show_lines_with_origin=True,
-        line_color="#5c5c5c",
+        line_color="#d4d4d4",
         dot_color="#525BCB",
         plot_index=0,
     ):

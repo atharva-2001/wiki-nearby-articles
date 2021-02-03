@@ -79,21 +79,34 @@ app.layout = html.Div(
                 html.Div(
                     dbc.Modal(
                         [
-                            dbc.ModalHeader("What is this?"),
+                            dbc.ModalHeader(
+                                [
+                                    html.P(
+                                        "What  is  this?",
+                                        style={
+                                            "font-size": "17px",
+                                            "letter-spacing": "2px",
+                                            "text-align": "center",
+                                            "margin": "auto",
+                                        },
+                                    )
+                                ],
+                            ),
                             dbc.ModalBody(
                                 [
                                     html.P(
                                         "This website helps you find connections between wikipedia articles."
                                     ),
-                                    html.Br(),
+                                    # html.Br(),
                                     html.P(
                                         "Use the dropdown to create connections. In the first graph, which has blue points, the dropdown has names of articles that are mentioned in the parent article. For example, the wikipedia article of Atom mentions the wikipedia article of Electron. The Cluster of Atom will have Electron as a point. You can similarly expand the cluster of Electron and see what articles are mentioned in it's article. You can do that by selecting electron from the dropdown. "
                                     ),
-                                    html.Br(),
+                                    # html.Br(),
                                     html.P(
                                         "The second graph is the exact opposite of the first graph. Here, the articles that mention the article of Atom, surround it. For example, the wikipedia article of Albert Einstein mentions the wikipedia article of Atom. Hence, it is a point in the cluster of Atom. If you select Albert Einstein from the dropdown, all the articles which mention Albert Einstein will surround it. "
                                     ),
-                                ]
+                                ],
+                                style={"font-size": "14px"},
                             ),
                             dbc.ModalFooter(
                                 dbc.Button(
@@ -134,7 +147,7 @@ app.layout = html.Div(
                     id="art_link",
                     className="text_input",
                     # placeholder = "enter wikipedia article link",
-                    value="https://en.wikipedia.org/wiki/MissingNo.",
+                    value="https://en.wikipedia.org/wiki/Atom",
                     style={
                         "font-size": "18px",
                         "fontFamily": "monospace",
@@ -166,7 +179,7 @@ app.layout = html.Div(
                     style={
                         "font-size": "17px",
                         "letter-spacing": "2px",
-                        "fontFamily": "monospace",
+                        # "fontFamily": "monospace",
                         "margin": "0  auto",
                         "display": "center",
                         "width": "60%",
