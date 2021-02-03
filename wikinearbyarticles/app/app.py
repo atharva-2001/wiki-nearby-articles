@@ -408,11 +408,6 @@ def update_output(clicks, val_fw, link):
 
     fw_dropdown_value = val_fw
 
-    print("printing points before updating the forwards graph")
-    print(fw_points_global)
-    print()
-    print(bw_points_global)
-
     if art_link != link:
         fw_points_global = {}
         bw_points_global = {}
@@ -436,7 +431,12 @@ def update_output(clicks, val_fw, link):
     DATA = R.json()
     summary = DATA["query"]["pages"][0]["extract"]
 
-    forwards = wna(link=art_link, prop_params="links", points=fw_points_global)
+    forwards = wna(
+        link=art_link,
+        prop_params="links",
+        points=fw_points_global,
+        plot_all_points=True,
+    )
     forwards.collect_points(center=fw_dropdown_value)
     fw_points = forwards.return_points(drop=True)
     fw_points = [{"label": item, "value": item} for item in fw_points]
@@ -444,10 +444,6 @@ def update_output(clicks, val_fw, link):
     fw_points_global = forwards.return_points(drop=False)
     forwards = forwards.plot()
     forwards["layout"] = net_layout
-    print("printing points after updating the forwards graph")
-    print(fw_points_global)
-    print()
-    print(bw_points_global)
 
     return forwards, summary, fw_points
 
@@ -470,17 +466,18 @@ def update_output(clicks, val_bw, link):
     global bw_dropdown_value
     bw_dropdown_value = val_bw
 
-    print("printing points before updating the backwards graph")
-    print(fw_points_global)
-    print()
-    print(bw_points_global)
     if art_link != link:
         fw_points_global = {}
         bw_points_global = {}
         art_link = link
         bw_dropdown_value = None
 
-    backwards = wna(link=art_link, prop_params="linkshere", points=bw_points_global)
+    backwards = wna(
+        link=art_link,
+        prop_params="linkshere",
+        points=bw_points_global,
+        plot_all_points=True,
+    )
     backwards.collect_points(center=bw_dropdown_value)
     bw_points = backwards.return_points(drop=True)
     bw_points = [{"label": item, "value": item} for item in bw_points]
@@ -488,11 +485,6 @@ def update_output(clicks, val_bw, link):
     bw_points_global = backwards.return_points(drop=False)
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
-
-    print("printing points after updating the backwards graph")
-    print(fw_points_global)
-    print()
-    print(bw_points_global)
 
     return backwards, bw_points
 

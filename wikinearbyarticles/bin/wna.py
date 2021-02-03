@@ -83,13 +83,13 @@ def get_calls(article_name, number_of_lines=7):
     R = S.get(url=URL, params=PARAMS)
     DATA = R.json()
     sys.stdout.flush()
-    # print(DATA)
-    # os._exit(0)
     return DATA
 
 
 class wna:
-    def __init__(self, link, prop_params, points_in_one_shot=36, points={}):
+    def __init__(
+        self, link, prop_params, points_in_one_shot=36, points={}, plot_all_points=None
+    ):
         """
         this is the main class
         link can have the website link and the article name as well
@@ -120,6 +120,7 @@ class wna:
             self.article_name = link.split("/")[-1]
         self.prop_params = prop_params
         self.points_in_one_plot = points_in_one_shot
+        self.plot_all_points = plot_all_points
         # if the link is updated, the points sent as arguments are already empty distionaries
         if points != {}:
             self.points = points
@@ -136,7 +137,6 @@ class wna:
 
         """
         if self.article_name not in self.points.keys():
-            # print("main section")
             S = requests.Session()
             URL = "https://en.wikipedia.org/w/api.php"
 
@@ -154,13 +154,13 @@ class wna:
             points = []
             for k, v in PAGES.items():
                 for l in v[self.prop_params]:
-                    # print(f"appending {l['title']} to lst ")
                     points.append(l["title"])
 
-            points = [
-                points[i : i + self.points_in_one_plot]
-                for i in range(0, len(points), self.points_in_one_plot)
-            ][plot_index]
+            if self.plot_all_points == False:
+                points = [
+                    points[i : i + self.points_in_one_plot]
+                    for i in range(0, len(points), self.points_in_one_plot)
+                ][plot_index]
 
             coords = random_points_in_a_sphere(
                 num=len(points), radius=5
@@ -172,7 +172,6 @@ class wna:
                 "point_names": points,
                 "coords": coords,
             }
-        # print(self.points)
         # * now consider the center has a value
         # * searching for its coords
 
@@ -180,14 +179,10 @@ class wna:
         cluster_origin = ""
         if_break = False
         if center != "" and center is not None:
-            # print("KEYS>>>", self.points.keys())
             for key in self.points.keys():
-                print("THIS IS THE KEY", key)
                 for name in self.points[key]["point_names"]:
-                    print("CHECKING CONDITION", name, center)
                     if name == center:
                         idx = self.points[key]["point_names"].index(name)
-                        print("CHECKED CONDITION", name, center)
                         center_coords = [
                             [self.points[key]["coords"][0][idx]],
                             [self.points[key]["coords"][1][idx]],
@@ -212,8 +207,6 @@ class wna:
                 if if_break:
                     break
 
-            # ! update coords of cluster center
-            # print("THIS IS CENTER", center, center_coords)
             S = requests.Session()
             URL = "https://en.wikipedia.org/w/api.php"
 
@@ -227,19 +220,18 @@ class wna:
 
             R = S.get(url=URL, params=PARAMS)
             DATA = R.json()
-            # print(DATA)
             PAGES = DATA["query"]["pages"]
             points = []
             for k, v in PAGES.items():
                 for l in v[self.prop_params]:
                     points.append(l["title"])
 
-            points = [
-                points[i : i + self.points_in_one_plot]
-                for i in range(0, len(points), self.points_in_one_plot)
-            ][plot_index]
+            if self.plot_all_points == False:
+                points = [
+                    points[i : i + self.points_in_one_plot]
+                    for i in range(0, len(points), self.points_in_one_plot)
+                ][plot_index]
 
-            print(center_coords)
             coords = random_points_in_a_sphere(
                 num=len(points),
                 radius=5,
@@ -248,7 +240,6 @@ class wna:
                 f=center_coords[2][0],
             )
 
-            # print("POINTS AFTER UPDATION...")
             self.points[center] = {
                 "center_coords": center_coords,
                 "cluster_origin": cluster_origin,
@@ -279,16 +270,17 @@ class wna:
 
         if collect_points:
             self.collect_points()
-            self.points = self.points[plot_index]
+            if self.plot_all_points == False:
+                self.points = self.points[plot_index]
         if display_all_summaries:
             S = requests.Session()
             URL = "https://en.wikipedia.org/w/api.php"
 
             hover_text = []
 
-            self.points = self.points[plot_index]
+            if self.plot_all_points == False:
+                self.points = self.points[plot_index]
 
-            print("getting summary...")
             for point in self.points:
                 PARAMS = {
                     "action": "query",
@@ -308,9 +300,8 @@ class wna:
                 )
                 hover_text.append(hover_text_for_one_point)
 
-            # ! do you want summary of the article selected?
+            # ! do you want summary of the article selected?s
             self.hover_text = hover_text
-            # print("got summary")
         else:
             print(f"trying to get hover text for {self.article_name}")
             return get_calls(article_name=self.article_name)
