@@ -5,6 +5,7 @@ from dash.dependencies import Input, State, Output
 import dash_html_components as html
 from dash_html_components.Div import Div
 import requests
+import dash_bootstrap_components as dbc
 
 from wikinearbyarticles.bin.wna import wna
 
@@ -16,7 +17,10 @@ art_link = ""
 bw_dropdown_value = ""
 fw_dropdown_value = ""
 
-external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
+external_stylesheets = [
+    "https://codepen.io/chriddyp/pen/bWLwgP.css",
+    dbc.themes.BOOTSTRAP,
+]
 
 app = dash.Dash(
     __name__,
@@ -62,6 +66,32 @@ app.layout = html.Div(
                     "color": "#525252",
                 },
             )
+        ),
+        html.Div(
+            [
+                html.Div(
+                    html.Button("Show me around", id="open-help"),
+                    style={
+                        "text-align": "center",
+                    },
+                ),
+                html.Div(
+                    dbc.Modal(
+                        [
+                            dbc.ModalHeader("What is this?"),
+                            dbc.ModalBody("This will help you out."),
+                            dbc.ModalFooter(
+                                dbc.Button(
+                                    "Close", id="close-help", className="ml-auto"
+                                )
+                            ),
+                        ],
+                        id="help",
+                        # is_open=True,
+                        scrollable=True,
+                    )
+                ),
+            ]
         ),
         html.Div(html.Hr()),
         html.Div(
@@ -326,6 +356,20 @@ app.layout = html.Div(
         ),
     ]
 )
+
+
+@app.callback(
+    Output("help", "is_open"),
+    [
+        Input("open-help", "n_clicks"),
+        Input("close-help", "n_clicks"),
+    ],
+    [State("help", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
 
 
 # this callback will only work when the article link is changed
