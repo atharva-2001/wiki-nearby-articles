@@ -4,6 +4,7 @@ import dash_core_components as dcc
 from dash.dependencies import Input, State, Output
 import dash_html_components as html
 from dash_html_components.Div import Div
+import dash_gif_component as Gif
 import requests
 import dash_bootstrap_components as dbc
 
@@ -79,7 +80,21 @@ app.layout = html.Div(
                     dbc.Modal(
                         [
                             dbc.ModalHeader("What is this?"),
-                            dbc.ModalBody("This will help you out."),
+                            dbc.ModalBody(
+                                [
+                                    html.P(
+                                        "This website helps you find connections between wikipedia articles."
+                                    ),
+                                    html.Br(),
+                                    html.P(
+                                        "Use the dropdown to create connections. In the first graph, which has blue points, the dropdown has names of articles that are mentioned in the parent article. For example, the wikipedia article of Atom mentions the wikipedia article of Electron. The Cluster of Atom will have Electron as a point. You can similarly expand the cluster of Electron and see what articles are mentioned in it's article. You can do that by selecting electron from the dropdown. "
+                                    ),
+                                    html.Br(),
+                                    html.P(
+                                        "The second graph is the exact opposite of the first graph. Here, the articles that mention the article of Atom, surround it. For example, the wikipedia article of Albert Einstein mentions the wikipedia article of Atom. Hence, it is a point in the cluster of Atom. If you select Albert Einstein from the dropdown, all the articles which mention Albert Einstein will surround it. "
+                                    ),
+                                ]
+                            ),
                             dbc.ModalFooter(
                                 dbc.Button(
                                     "Close", id="close-help", className="ml-auto"
