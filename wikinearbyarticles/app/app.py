@@ -56,6 +56,37 @@ net_layout = {
 app.layout = html.Div(
     [
         html.Div(
+            dbc.Modal(
+                [
+                    dbc.ModalHeader(
+                        [
+                            html.P(
+                                "Have Patience Please",
+                                style={
+                                    "font-size": "17px",
+                                    "letter-spacing": "2px",
+                                    "text-align": "center",
+                                    "margin": "auto",
+                                },
+                            )
+                        ],
+                    ),
+                    dbc.ModalBody(
+                        [
+                            html.P(
+                                "the site takes a couple seconds to load, just hold on :)"
+                            )
+                        ],
+                        style={"font-size": "14px"},
+                    ),
+                ],
+                id="sad-intro",
+                is_open=True,
+                scrollable=True,
+                centered=True,
+            )
+        ),
+        html.Div(
             html.P(
                 "wiki nearby articles",
                 style={
@@ -398,6 +429,7 @@ def toggle_modal(n1, n2, is_open):
     if n1 or n2:
         return not is_open
     return is_open
+
 
 
 # this callback will only work when the article link is changed
