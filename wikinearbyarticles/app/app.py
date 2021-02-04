@@ -98,6 +98,12 @@ app.layout = html.Div(
                                         "This website helps you find connections between wikipedia articles."
                                     ),
                                     # html.Br(),
+                                    html.Div(
+                                        Gif.GifPlayer(
+                                            gif="assets/dropdown.gif",
+                                            still="assets/dropdown.png",
+                                        )
+                                    ),
                                     html.P(
                                         "Use the dropdown to create connections. In the first graph, which has blue points, the dropdown has names of articles that are mentioned in the parent article. For example, the wikipedia article of Atom mentions the wikipedia article of Electron. The Cluster of Atom will have Electron as a point. You can similarly expand the cluster of Electron and see what articles are mentioned in it's article. You can do that by selecting electron from the dropdown. "
                                     ),
@@ -116,6 +122,7 @@ app.layout = html.Div(
                         ],
                         id="help",
                         # is_open=True,
+                        size="xl",
                         scrollable=True,
                     )
                 ),
