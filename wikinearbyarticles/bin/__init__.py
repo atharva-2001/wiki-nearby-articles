@@ -1,3 +1,2 @@
-__all__ = ["wna.py" ]
+__all__ = ["wna.py"]
 from . import wna
-
