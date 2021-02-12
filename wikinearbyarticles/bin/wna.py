@@ -32,9 +32,9 @@ def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
             math.sqrt((x - h) ** 2 + (y - g) ** 2 + (z - f) ** 2) <= radius
         ):  # checking if the point is in the circle
             if (x != 0) and (y != 0) and (z != 0):
-                coor[0].append(x)
-                coor[1].append(y)
-                coor[2].append(z)
+                coor[0].append(np.round(x, 2))
+                coor[1].append(np.round(y, 2))
+                coor[2].append(np.round(z, 2))
                 index += 1
     return coor
 
@@ -121,6 +121,7 @@ class wna:
         self.prop_params = prop_params
         self.points_in_one_plot = points_in_one_shot
         self.plot_all_points = plot_all_points
+        self.sections = 0
         # if the link is updated, the points sent as arguments are already empty distionaries
         if points != {}:
             self.points = points
@@ -136,6 +137,12 @@ class wna:
         else center will be the name of the article which has to be expanded.
 
         """
+        print("####")
+        print(self.points)
+        print("####")
+
+        if self.points != {}:
+            self.points = self.points[0]
         if self.article_name not in self.points.keys():
             S = requests.Session()
             URL = "https://en.wikipedia.org/w/api.php"
@@ -160,7 +167,11 @@ class wna:
                 points = [
                     points[i : i + self.points_in_one_plot]
                     for i in range(0, len(points), self.points_in_one_plot)
-                ][plot_index]
+                ]
+                self.sections = len(points)
+                if plot_index is None:
+                    plot_index = 0
+                points = points[plot_index]
 
             coords = random_points_in_a_sphere(
                 num=len(points), radius=5
@@ -256,9 +267,9 @@ class wna:
             points = []
             for key in self.points.keys():
                 points += self.points[key]["point_names"]
-            return points
+            return points, self.sections
         else:
-            return self.points
+            return self.points, self.sections
 
     def article_summary_for_hover(
         self,
@@ -272,14 +283,12 @@ class wna:
             self.collect_points()
             if self.plot_all_points == False:
                 self.points = self.points[plot_index]
+
         if display_all_summaries:
             S = requests.Session()
             URL = "https://en.wikipedia.org/w/api.php"
 
             hover_text = []
-
-            if self.plot_all_points == False:
-                self.points = self.points[plot_index]
 
             for point in self.points:
                 PARAMS = {

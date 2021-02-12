@@ -128,7 +128,6 @@ app.layout = html.Div(
                                     html.P(
                                         "This website helps you find connections between wikipedia articles."
                                     ),
-                                    # html.Br(),
                                     html.Div(
                                         Gif.GifPlayer(
                                             gif="assets/dropdown.gif",
@@ -138,7 +137,6 @@ app.layout = html.Div(
                                     html.P(
                                         "Use the dropdown to create connections. In the first graph, which has blue points, the dropdown has names of articles that are mentioned in the parent article. For example, the wikipedia article of Atom mentions the wikipedia article of Electron. The Cluster of Atom will have Electron as a point. You can similarly expand the cluster of Electron and see what articles are mentioned in it's article. You can do that by selecting electron from the dropdown. "
                                     ),
-                                    # html.Br(),
                                     html.P(
                                         "The second graph is the exact opposite of the first graph. Here, the articles that mention the article of Atom, surround it. For example, the wikipedia article of Albert Einstein mentions the wikipedia article of Atom. Hence, it is a point in the cluster of Atom. If you select Albert Einstein from the dropdown, all the articles which mention Albert Einstein will surround it. "
                                     ),
@@ -438,21 +436,27 @@ def toggle_modal(n1, n2, is_open):
     return is_open
 
 
-
 # this callback will only work when the article link is changed
 @app.callback(
     [
         dash.dependencies.Output("forwards", "figure"),
         dash.dependencies.Output("main-article-summary", "children"),
         dash.dependencies.Output("points-fw", "options"),
+        # dash.dependencies.Output("choose-section-forward", "options"),
     ],
     [
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-fw", "value"),
+        # dash.dependencies.Input("choose-section-forward", "value"),
     ],
     [dash.dependencies.State("art_link", "value")],
 )
-def update_output(clicks, val_fw, link):
+def update_output(
+    clicks,
+    val_fw,
+    # selected_section,
+    link,
+):
     global art_link
     global fw_points_global
     global bw_points_global
@@ -487,31 +491,39 @@ def update_output(clicks, val_fw, link):
         link=art_link,
         prop_params="links",
         points=fw_points_global,
-        plot_all_points=True,
+        plot_all_points=False,
     )
     forwards.collect_points(center=fw_dropdown_value)
-    fw_points = forwards.return_points(drop=True)
+    fw_points, section = forwards.return_points(drop=True)
     fw_points = [{"label": item, "value": item} for item in fw_points]
+    # section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
 
     fw_points_global = forwards.return_points(drop=False)
     forwards = forwards.plot()
     forwards["layout"] = net_layout
 
-    return forwards, summary, fw_points
+    return (forwards, summary, fw_points)
 
 
 @app.callback(
     [
         dash.dependencies.Output("backwards", "figure"),
         dash.dependencies.Output("points-bw", "options"),
+        # dash.dependencies.Output("choose-section-backward", "options"),
     ],
     [
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-bw", "value"),
+        # dash.dependencies.Input("choose-section-backward", "value"),
     ],
     [dash.dependencies.State("art_link", "value")],
 )
-def update_output(clicks, val_bw, link):
+def update_output(
+    clicks,
+    val_bw,
+    # selected_section,
+    link,
+):
     global art_link
     global fw_points_global
     global bw_points_global
@@ -528,11 +540,12 @@ def update_output(clicks, val_bw, link):
         link=art_link,
         prop_params="linkshere",
         points=bw_points_global,
-        plot_all_points=True,
+        plot_all_points=False,
     )
     backwards.collect_points(center=bw_dropdown_value)
-    bw_points = backwards.return_points(drop=True)
+    bw_points, section = backwards.return_points(drop=True)
     bw_points = [{"label": item, "value": item} for item in bw_points]
+    section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
 
     bw_points_global = backwards.return_points(drop=False)
     backwards = backwards.plot(dot_color="#ff3b3b")
@@ -599,7 +612,7 @@ def show_hover_text(data):
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host)
+    app.run_server(debug=debug, host=host, port=3004)
 
 
 if __name__ == "__main__":
