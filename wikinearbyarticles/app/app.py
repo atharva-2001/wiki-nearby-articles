@@ -198,13 +198,20 @@ app.layout = html.Div(
                         # "background-color": "#1a1a1a",
                         "color": "#525252",
                         "padding-bottom": "3px",
+                        "padding-left": "10%",
+                        "display": "inline-block", 
+                        "width": "70%"
                     },
                 ),
                 html.Button(
                     id="submit",
                     type="submit",
                     children="ok",
-                    style={"display": "inline-block", "width": "5%"},
+                    style={
+                        "display": "inline-block", 
+                        "width": "10%",
+                        "padding-right": "10%",
+                    },
                 ),
             ]
         ),
