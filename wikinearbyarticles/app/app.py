@@ -487,7 +487,6 @@ def update_output(
 ):
     global art_link
     global fw_points_global
-    global bw_points_global
     global fw_dropdown_value
     global summary
 
@@ -495,7 +494,6 @@ def update_output(
 
     if art_link != link:
         fw_points_global = {}
-        bw_points_global = {}
         art_link = link
         fw_dropdown_value = None
 
@@ -554,13 +552,11 @@ def update_output(
     link,
 ):
     global art_link
-    global fw_points_global
     global bw_points_global
     global bw_dropdown_value
     bw_dropdown_value = val_bw
 
     if art_link != link:
-        fw_points_global = {}
         bw_points_global = {}
         art_link = link
         bw_dropdown_value = None
