@@ -179,38 +179,52 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(id="target"),
-                dcc.Input(
-                    id="art_link",
-                    className="text_input",
-                    # placeholder = "enter wikipedia article link",
-                    value="https://en.wikipedia.org/wiki/Atom",
+                html.Div(
+                    children=[
+                        html.Div(
+                            dcc.Input(
+                                id="art_link",
+                                className="text_input",
+                                # placeholder = "enter wikipedia article link",
+                                value="https://en.wikipedia.org/wiki/Atom",
+                                style={
+                                    # "padding-left": "10%",
+                                    "font-size": "18px",
+                                    # "fontFamily": "monospace",
+                                    "width": "100%",
+                                    "text-align": "center",
+                                    "text-spacing": "1px",
+                                    # 'padding-left':'10%', 'padding-right':'10%',
+                                    "border": "0px none",
+                                    "border-bottom": "0.5px solid #5c5c5c",
+                                    # "background-color": "#1a1a1a",
+                                    "color": "#525252",
+                                    # "padding-bottom": "3px",
+                                },
+                            ),
+                            style={
+                                "display": "inline-block",
+                                "width": "70%",
+                            },
+                        ),
+                        html.Div(
+                            html.Button(
+                                id="submit",
+                                type="submit",
+                                children="ok",
+                                style={"width": "100%"},
+                            ),
+                            style={
+                                "display": "inline-block",
+                                "width": "10%",
+                                # "padding-right": "10%",
+                            },
+                        ),
+                    ],
                     style={
-                        "font-size": "18px",
-                        "fontFamily": "monospace",
-                        # "margin": "0  auto",
-                        # "display": "center",
-                        "width": "95%",
-                        "text-align": "center",
-                        "text-spacing": "1px",
-                        # 'padding-left':'10%', 'padding-right':'10%',
-                        "border": "none",
-                        "border-bottom": "0.5px solid #5c5c5c",
-                        # "background-color": "#1a1a1a",
-                        "color": "#525252",
-                        "padding-bottom": "3px",
                         "padding-left": "10%",
-                        "display": "inline-block", 
-                        "width": "70%"
-                    },
-                ),
-                html.Button(
-                    id="submit",
-                    type="submit",
-                    children="ok",
-                    style={
-                        "display": "inline-block", 
-                        "width": "10%",
                         "padding-right": "10%",
+                        "text-align": "center",
                     },
                 ),
             ]
