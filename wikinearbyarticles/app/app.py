@@ -96,6 +96,7 @@ app.layout = html.Div(
                     "text-align": "center",
                     "font-weight": "light",
                     "color": "#525252",
+                    "text-shadow": "1.5px 1.5px lightgrey",
                 },
             )
         ),
@@ -199,12 +200,16 @@ app.layout = html.Div(
                                     "border-bottom": "0.5px solid #5c5c5c",
                                     # "background-color": "#1a1a1a",
                                     "color": "#525252",
-                                    # "padding-bottom": "3px",
+                                    "-webkit-box-shadow": "0 2px 2px -2px grey",
+                                    "-moz-box-shadow": "0 2px 2px -2px grey",
+                                    "box-shadow": "0 2px 2px -2px grey",
                                 },
                             ),
                             style={
                                 "display": "inline-block",
-                                "width": "70%",
+                                "width": "100%",
+                                "padding-bottom": "8px",
+                                # "box-shadow": " 10px 0px px 0px lightgrey",
                             },
                         ),
                         html.Div(
@@ -217,6 +222,7 @@ app.layout = html.Div(
                             style={
                                 "display": "inline-block",
                                 "width": "10%",
+                                "padding-bottom": "15px",
                                 # "padding-right": "10%",
                             },
                         ),
