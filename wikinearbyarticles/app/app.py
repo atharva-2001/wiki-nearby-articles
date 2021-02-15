@@ -17,6 +17,7 @@ bw_points_global = {}
 art_link = ""
 bw_dropdown_value = ""
 fw_dropdown_value = ""
+summary = ""
 
 external_stylesheets = [
     "https://codepen.io/chriddyp/pen/bWLwgP.css",
@@ -488,6 +489,7 @@ def update_output(
     global fw_points_global
     global bw_points_global
     global fw_dropdown_value
+    global summary
 
     fw_dropdown_value = val_fw
 
@@ -497,22 +499,22 @@ def update_output(
         art_link = link
         fw_dropdown_value = None
 
-    title = art_link.split("/")[-1]
-    S = requests.Session()
-    URL = "https://en.wikipedia.org/w/api.php"
-    PARAMS = {
-        "action": "query",
-        "format": "json",
-        "titles": title,
-        "prop": "extracts",
-        "exsentences": "5",
-        "exlimit": "1",
-        "explaintext": "1",
-        "formatversion": "2",
-    }
-    R = S.get(url=URL, params=PARAMS)
-    DATA = R.json()
-    summary = DATA["query"]["pages"][0]["extract"]
+        title = art_link.split("/")[-1]
+        S = requests.Session()
+        URL = "https://en.wikipedia.org/w/api.php"
+        PARAMS = {
+            "action": "query",
+            "format": "json",
+            "titles": title,
+            "prop": "extracts",
+            "exsentences": "5",
+            "exlimit": "1",
+            "explaintext": "1",
+            "formatversion": "2",
+        }
+        R = S.get(url=URL, params=PARAMS)
+        DATA = R.json()
+        summary = DATA["query"]["pages"][0]["extract"]
 
     forwards = wna(
         link=art_link,

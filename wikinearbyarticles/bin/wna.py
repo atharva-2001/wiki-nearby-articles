@@ -267,6 +267,8 @@ class wna:
             points = []
             for key in self.points.keys():
                 points += self.points[key]["point_names"]
+                if key in points:
+                    points = [item for item in points if item != key]
             return points, self.sections
         else:
             return self.points, self.sections
