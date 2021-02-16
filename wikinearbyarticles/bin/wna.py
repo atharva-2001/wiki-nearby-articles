@@ -137,9 +137,6 @@ class wna:
         else center will be the name of the article which has to be expanded.
 
         """
-        print("####")
-        print(self.points)
-        print("####")
 
         if self.points != {}:
             self.points = self.points[0]
@@ -267,7 +264,6 @@ class wna:
             points = []
             for key in self.points.keys():
                 points += self.points[key]["point_names"]
-                print(points)
                 if key in points:
                     points = [item for item in points if item != key]
             return points, self.sections
@@ -342,10 +338,10 @@ class wna:
                     z=self.points[cluster_name]["center_coords"][2],
                     text=[cluster_name],
                     marker=dict(
-                        size=14, color=dot_color, opacity=0.5
+                        size=5, color=dot_color, opacity=0.5
                     ),  # change the marker color of the central marker
-                    mode="markers+text",
-                    hoverinfo="text",  # what did this do?
+                    mode="markers",
+                    # hoverinfo="text",  # what did this do?
                 )
             )
             fig.add_trace(
@@ -354,7 +350,7 @@ class wna:
                     y=self.points[cluster_name]["coords"][1],
                     z=self.points[cluster_name]["coords"][2],
                     hovertext=self.points[cluster_name]["point_names"],
-                    marker=dict(size=5, color=dot_color, opacity=0.5),
+                    marker=dict(size=2, color=dot_color, opacity=0.5),
                     # change the marker color of the central marker
                     mode="markers+text",
                     hoverinfo="text",  # what did this do?
