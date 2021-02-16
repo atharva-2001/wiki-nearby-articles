@@ -14,7 +14,8 @@ from wikinearbyarticles.bin.wna import wna
 # TODO between graphs as they are updated, extending graphs
 fw_points_global = {}
 bw_points_global = {}
-art_link = ""
+art_link_bw = ""
+art_link_fw = ""
 bw_dropdown_value = ""
 fw_dropdown_value = ""
 summary = ""
@@ -485,19 +486,19 @@ def update_output(
     # selected_section,
     link,
 ):
-    global art_link
+    global art_link_fw
     global fw_points_global
     global fw_dropdown_value
     global summary
 
     fw_dropdown_value = val_fw
 
-    if art_link != link:
+    if art_link_fw != link:
         fw_points_global = {}
-        art_link = link
+        art_link_fw = link
         fw_dropdown_value = None
 
-        title = art_link.split("/")[-1]
+        title = art_link_fw.split("/")[-1]
         S = requests.Session()
         URL = "https://en.wikipedia.org/w/api.php"
         PARAMS = {
@@ -515,7 +516,7 @@ def update_output(
         summary = DATA["query"]["pages"][0]["extract"]
 
     forwards = wna(
-        link=art_link,
+        link=art_link_fw,
         prop_params="links",
         points=fw_points_global,
         plot_all_points=False,
@@ -551,18 +552,21 @@ def update_output(
     # selected_section,
     link,
 ):
-    global art_link
+
+    global art_link_bw
     global bw_points_global
     global bw_dropdown_value
     bw_dropdown_value = val_bw
 
-    if art_link != link:
+    if art_link_bw != link:
         bw_points_global = {}
-        art_link = link
+        print("seems like link updated...")
+        print("bw points", bw_points_global)
+        art_link_bw = link
         bw_dropdown_value = None
 
     backwards = wna(
-        link=art_link,
+        link=art_link_bw,
         prop_params="linkshere",
         points=bw_points_global,
         plot_all_points=False,
