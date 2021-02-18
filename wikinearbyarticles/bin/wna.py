@@ -19,7 +19,7 @@ def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
     """
     coor = [[], [], []]
     index = 0
-    print("finding random points...")
+    # print("finding random points...")
     while True:
         if index > num - 1:
             break
@@ -46,7 +46,7 @@ def extend_points(tip=[[0], [0], [0]], end=[[0], [0], [0]], factor=2):
     the default value of tip is the origin
     end is also a list
     """
-    print("extending coords...")
+    # print("extending coords...")
     xnew = factor * (end[0][0] - tip[0][0]) + tip[0][0]
     ynew = factor * (end[1][0] - tip[1][0]) + tip[1][0]
     znew = factor * (end[2][0] - tip[2][0]) + tip[2][0]
@@ -311,7 +311,7 @@ class wna:
             # ! do you want summary of the article selected?s
             self.hover_text = hover_text
         else:
-            print(f"trying to get hover text for {self.article_name}")
+            # print(f"trying to get hover text for {self.article_name}")
             return get_calls(article_name=self.article_name)
 
     def plot(
@@ -331,15 +331,20 @@ class wna:
         # plotting the central point
 
         for cluster_name in self.points.keys():
+            # adds the center cluster itself
+            # though I am not so proud of the code I have written
+            # and there is probably a better way to do this, here is the explanation for the traces
+            # the first trace added just below adds the ckusters to the diagram.
+            # the trace after that adds the points corresponding to the cluster.
+            # points corresponding to that particular cluster, none else.
+
             fig.add_trace(
                 go.Scatter3d(
                     x=self.points[cluster_name]["center_coords"][0],
                     y=self.points[cluster_name]["center_coords"][1],
                     z=self.points[cluster_name]["center_coords"][2],
                     text=[cluster_name],
-                    marker=dict(
-                        size=5, color=dot_color, opacity=0.5
-                    ),  # change the marker color of the central marker
+                    marker=dict(size=5, color=dot_color, opacity=0.5),
                     mode="markers",
                     # hoverinfo="text",  # what did this do?
                 )
@@ -351,12 +356,15 @@ class wna:
                     z=self.points[cluster_name]["coords"][2],
                     hovertext=self.points[cluster_name]["point_names"],
                     marker=dict(size=2, color=dot_color, opacity=0.5),
-                    # change the marker color of the central marker
                     mode="markers+text",
-                    hoverinfo="text",  # what did this do?
+                    hoverinfo="text",
                 )
             )
 
+        # this below adds the lines in plot.
+        # this is a tough job, and adds a lot of traces to the graph, which consumes a lot of resources.
+        # again, maybe there is a better way
+        # I did ask this question on plotly community forum, and am yet to recieve a response.
         for cluster_name in self.points.keys():
             idx = 0
             while idx < len(self.points[cluster_name]["point_names"]):
@@ -381,12 +389,14 @@ class wna:
                 ),
                 idx += 1
 
+        # this is pretty simple
+        # this fixes the layout. However, I am adding this again to the plot, or redefining the layout in the callback, and thats causing a little trouble too
+        # and I will fix it soon too
         fig.update_layout(
             height=1200,
             width=800,
             hoverlabel={
                 "font": {"family": "monospace"},
-                # "hover"
             },
             # template = "plotly_dark",
             font={"family": "monospace", "size": 18},
@@ -404,5 +414,4 @@ class wna:
             },
         )
         fig.update_traces(showlegend=False)
-        # fig.show()
         return fig

@@ -1,3 +1,4 @@
+from dash_bootstrap_components.themes import DARKLY
 import flask
 import dash
 import dash_core_components as dcc
@@ -17,18 +18,29 @@ external_stylesheets = [
 ]
 
 net_layout = {
-    "height": 1080,
+    "height": 950,
     "width": 1800,
     "hoverlabel": {
         "font": {"family": "monospace"},
-        # "hover"4
     },
-    # template = "plotly_dark",
+    # "template": "plotly_dark",
     "font": {"family": "monospace", "size": 18},
     "scene": {
-        "xaxis": {"range": [-50, 50], "visible": False, "showticklabels": False},
-        "yaxis": {"range": [-50, 50], "visible": False, "showticklabels": False},
-        "zaxis": {"range": [-50, 50], "visible": False, "showticklabels": False},
+        "xaxis": {
+            # "range": [-50, 50],
+            "visible": False,
+            "showticklabels": False,
+        },
+        "yaxis": {
+            # "range": [-50, 50],
+            "visible": False,
+            "showticklabels": False,
+        },
+        "zaxis": {
+            # "range": [-50, 50],
+            "visible": False,
+            "showticklabels": False,
+        },
     },
     "margin": {
         "pad": 0,
@@ -50,7 +62,7 @@ def random_cluster_center(points):
                 filtered_points = [item for item in filtered_points if item != key]
                 # print(filtered_points)
         r_int = np.random.randint(0, len(filtered_points) - 1)
-        print(r_int, len(filtered_points))
+        # print(r_int, len(filtered_points))
         return filtered_points[r_int]
     else:
         return None
@@ -65,7 +77,7 @@ app = dash.Dash(
 
 app.layout = html.Div(
     [
-        html.Div(dcc.Graph(id="auto")),
+        html.Div(dcc.Graph(id="auto"), style={"width": "100vh", "height": "100vh"}),
         html.Div(
             [
                 html.Div(id="target"),
@@ -148,19 +160,26 @@ def update_data(clicks, n_intervals, link):
         plot_all_points=False,
     )
 
+    center = random_cluster_center(points=points)
+    print(f"adding {center}...")
     auto.collect_points(center=random_cluster_center(points=points))
     auto_points = auto.return_points(drop=False)
     points = auto_points
-    # print(auto_points)
-    auto = auto.plot()
+
+    auto = auto.plot(dot_color="#ff3b3b")
     auto["layout"] = net_layout
-    print(auto)
 
     return auto
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host, port=9001)
+    app.run_server(
+        debug=debug,
+        host=host,
+        port=8041,
+        dev_tools_ui=False,
+        dev_tools_props_check=False,
+    )
 
 
 if __name__ == "__main__":
