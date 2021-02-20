@@ -1,13 +1,11 @@
 import flask
 import dash
+import json
 import dash_core_components as dcc
-from dash.dependencies import Input, State, Output
 import dash_html_components as html
-from dash_html_components.Div import Div
 import dash_gif_component as Gif
 import requests
 import dash_bootstrap_components as dbc
-
 from wikinearbyarticles.bin.wna import wna
 
 # TODO add animations
@@ -57,6 +55,15 @@ net_layout = {
 
 app.layout = html.Div(
     [
+        html.Div([
+            dcc.Store(id="fw-points"),
+            dcc.Store(id="bw-points"),
+            dcc.Store(id="art_link_bw"),
+            dcc.Store(id="art_link_fw"),
+            dcc.Store(id="bw_dropdown_value"),
+            dcc.Store(id="fw_dropdown_value"),
+            dcc.Store(id="summary")
+        ]),
         html.Div(
             dbc.Modal(
                 [
@@ -211,7 +218,6 @@ app.layout = html.Div(
                                 "display": "inline-block",
                                 "width": "100%",
                                 "padding-bottom": "8px",
-                                # "box-shadow": " 10px 0px px 0px lightgrey",
                             },
                         ),
                         html.Div(
@@ -452,12 +458,12 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output("help", "is_open"),
+    dash.dependencies.Output("help", "is_open"),
     [
-        Input("open-help", "n_clicks"),
-        Input("close-help", "n_clicks"),
+        dash.dependencies.Input("open-help", "n_clicks"),
+        dash.dependencies.Input("close-help", "n_clicks"),
     ],
-    [State("help", "is_open")],
+    [dash.dependencies.State("help", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
@@ -471,32 +477,51 @@ def toggle_modal(n1, n2, is_open):
         dash.dependencies.Output("forwards", "figure"),
         dash.dependencies.Output("main-article-summary", "children"),
         dash.dependencies.Output("points-fw", "options"),
+        dash.dependencies.Output("fw-points", "data"),
+        dash.dependencies.Output("fw_dropdown_value", "data"),
+        dash.dependencies.Output("art_link_fw", "data"),
+        dash.dependencies.Output("summary", "data"),
         # dash.dependencies.Output("choose-section-forward", "options"),
     ],
     [
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-fw", "value"),
+        dash.dependencies.Input("fw-points", "data"),
+        dash.dependencies.Input("fw_dropdown_value", "data"),
+        dash.dependencies.Input("art_link_fw", "data"),
+        dash.dependencies.Input("summary", "data"),
         # dash.dependencies.Input("choose-section-forward", "value"),
     ],
     [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
-    clicks,
-    val_fw,
-    # selected_section,
-    link,
+        clicks,
+        val_fw,  # the value of the option selected in the dropdown for the forwards graph
+        forward_points,  # the points that were saved in dcc.Store
+        forward_points_dropdown,  # the list of the options mentioned in the dropdown
+        link_saved,  # the link as saved in dcc.Store
+        summary_saved,
+        link,  # the link when the graph updates
 ):
-    global art_link_fw
-    global fw_points_global
-    global fw_dropdown_value
-    global summary
 
-    fw_dropdown_value = val_fw
+    print("submit", "n_clicks"),
+    print("points-fw", "value"),
+    print("fw-points", "data"),
+    print("fw_dropdown_value", "data"),
+    print("art_link_fw", "data"),
+    print("summary", "data"),
+    # global art_link_fw
+    # global fw_points_global
+    # global fw_dropdown_value
+    # global summary
 
-    if art_link_fw != link:
-        fw_points_global = {}
-        art_link_fw = link
-        fw_dropdown_value = None
+    # fw_dropdown_value = val_fw
+
+    summary_callback = summary_saved
+    if link_saved != link:
+        forward_points = {}
+        link_saved = link
+        forward_points_dropdown = None
 
         title = art_link_fw.split("/")[-1]
         S = requests.Session()
@@ -513,24 +538,42 @@ def update_output(
         }
         R = S.get(url=URL, params=PARAMS)
         DATA = R.json()
-        summary = DATA["query"]["pages"][0]["extract"]
+        summary_callback = DATA["query"]["pages"][0]["extract"]
 
     forwards = wna(
-        link=art_link_fw,
+        link=link_saved,
         prop_params="links",
-        points=fw_points_global,
-        plot_all_points=False,
+        points=forward_points,
+        plot_all_points=False,  # this plots a limited number of points, the number can be limited too
     )
-    forwards.collect_points(center=fw_dropdown_value)
-    fw_points, section = forwards.return_points(drop=True)
-    fw_points = [{"label": item, "value": item} for item in fw_points]
-    # section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
 
-    fw_points_global = forwards.return_points(drop=False)
+    # this sets the center of the new cluster to be formed
+    forwards.collect_points(center=fw_dropdown_value)
+
+    # drop is True specifies that the points to return should be returned for the dropdown
+    forward_points_dropdown, section = forwards.return_points(drop=True)
+
+    # generating items for the dropdown list below
+    forward_points_dropdown = [{"label": item, "value": item} for item in forward_points_dropdown]
+
+    forward_points = forwards.return_points(drop=False)
+    dash.callback_context.response.set_cookie(
+        "fw points",
+        json.dumps(fw_points_global, indent=4)
+    )
+
     forwards = forwards.plot()
     forwards["layout"] = net_layout
 
-    return (forwards, summary, fw_points)
+    return (
+        forwards,  # the figure
+        summary_callback,  # the summary to be updated, this shouldn't be updated in every callback
+        forward_points_dropdown,  # points for the dropdown
+        forward_points,  # complete points package, stored in dcc.Store
+        fw_dropdown_value,  # the value of the dropdown selected
+        link_saved,  # the value of the link which is stored in dcc.Store
+        summary_saved,  # summary stored in dcc.Store
+    )
 
 
 @app.callback(
@@ -547,12 +590,11 @@ def update_output(
     [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
-    clicks,
-    val_bw,
-    # selected_section,
-    link,
+        clicks,
+        val_bw,
+        # selected_section,
+        link,
 ):
-
     global art_link_bw
     global bw_points_global
     global bw_dropdown_value
