@@ -101,14 +101,14 @@ class wna:
                 "cluster_origin": "some string, name of the article directly connected before expanding"
                 "center_coords": [[0], [0], [0]],
                 "point_names": ["string 1", "string 2"],
-                "coords": [[x coords llist], [y coords llist], [z coords llist]]
+                "coords": [[x coords list], [y coords list], [z coords list]]
             }
             # other sections will be added like this
             "some article as center": {
                 "cluster_origin": "some string as before"
                 "center_coords": [[x], [y], [z]],
                 "point_names": ["string 1", "string 2"],
-                "coords": [[x coords list], [y coords list], [z coords llist]]
+                "coords": [[x coords list], [y coords list], [z coords list]]
             }
         }
         """
@@ -122,7 +122,7 @@ class wna:
         self.points_in_one_plot = points_in_one_shot
         self.plot_all_points = plot_all_points
         self.sections = 0
-        # if the link is updated, the points sent as arguments are already empty distionaries
+        # if the link is updated, the points sent as arguments are already empty dictionaries
         if points != {}:
             self.points = points
         else:
@@ -234,9 +234,9 @@ class wna:
                 for l in v[self.prop_params]:
                     points.append(l["title"])
 
-            if self.plot_all_points == False:
+            if not self.plot_all_points:
                 points = [
-                    points[i : i + self.points_in_one_plot]
+                    points[i: i + self.points_in_one_plot]
                     for i in range(0, len(points), self.points_in_one_plot)
                 ][plot_index]
 
@@ -334,10 +334,9 @@ class wna:
             # adds the center cluster itself
             # though I am not so proud of the code I have written
             # and there is probably a better way to do this, here is the explanation for the traces
-            # the first trace added just below adds the ckusters to the diagram.
+            # the first trace added just below adds the clusters to the diagram.
             # the trace after that adds the points corresponding to the cluster.
             # points corresponding to that particular cluster, none else.
-
             fig.add_trace(
                 go.Scatter3d(
                     x=self.points[cluster_name]["center_coords"][0],

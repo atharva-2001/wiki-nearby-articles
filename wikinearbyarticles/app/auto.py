@@ -52,7 +52,7 @@ net_layout = {
 }
 
 
-def random_cluster_center(points):
+def random_cluster_center(points): # Shadows name points in outer scope
     filtered_points = []
     if points != {}:
         points = points[0]
@@ -90,13 +90,10 @@ app.layout = html.Div(
                                 # placeholder = "enter wikipedia article link",
                                 value="https://en.wikipedia.org/wiki/Atom",
                                 style={
-                                    # "padding-left": "10%",
                                     "font-size": "18px",
-                                    # "fontFamily": "monospace",
                                     "width": "100%",
                                     "text-align": "center",
                                     "text-spacing": "1px",
-                                    # 'padding-left':'10%', 'padding-right':'10%',
                                     "border": "0px none",
                                     "border-bottom": "0.5px solid #5c5c5c",
                                     # "background-color": "#1a1a1a",
@@ -110,7 +107,6 @@ app.layout = html.Div(
                                 "display": "inline-block",
                                 "width": "100%",
                                 "padding-bottom": "8px",
-                                # "box-shadow": " 10px 0px px 0px lightgrey",
                             },
                         ),
                         html.Div(
@@ -124,7 +120,6 @@ app.layout = html.Div(
                                 "display": "inline-block",
                                 "width": "10%",
                                 "padding-bottom": "15px",
-                                # "padding-right": "10%",
                             },
                         ),
                     ],
