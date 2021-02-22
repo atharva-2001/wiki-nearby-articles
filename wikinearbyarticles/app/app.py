@@ -55,15 +55,17 @@ net_layout = {
 
 app.layout = html.Div(
     [
-        html.Div([
-            dcc.Store(id="fw-points"),
-            dcc.Store(id="bw-points"),
-            dcc.Store(id="art_link_bw"),
-            dcc.Store(id="art_link_fw"),
-            dcc.Store(id="bw_dropdown_value"),
-            dcc.Store(id="fw_dropdown_value"),
-            dcc.Store(id="summary")
-        ]),
+        html.Div(
+            [
+                dcc.Store(id="fw-points"),
+                dcc.Store(id="bw-points"),
+                dcc.Store(id="art_link_bw"),
+                dcc.Store(id="art_link_fw"),
+                dcc.Store(id="bw_dropdown_value"),
+                dcc.Store(id="fw_dropdown_value"),
+                dcc.Store(id="summary"),
+            ]
+        ),
         html.Div(
             dbc.Modal(
                 [
@@ -495,13 +497,13 @@ def toggle_modal(n1, n2, is_open):
     [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
-        clicks,
-        val_fw,  # the value of the option selected in the dropdown for the forwards graph
-        forward_points,  # the points that were saved in dcc.Store
-        forward_points_dropdown,  # the list of the options mentioned in the dropdown
-        link_saved,  # the link as saved in dcc.Store
-        summary_saved,
-        link,  # the link when the graph updates
+    clicks,
+    val_fw,  # the value of the option selected in the dropdown for the forwards graph
+    forward_points,  # the points that were saved in dcc.Store
+    forward_points_dropdown,  # the list of the options mentioned in the dropdown
+    link_saved,  # the link as saved in dcc.Store
+    summary_saved,
+    link,  # the link when the graph updates
 ):
 
     print("submit", "n_clicks"),
@@ -554,12 +556,13 @@ def update_output(
     forward_points_dropdown, section = forwards.return_points(drop=True)
 
     # generating items for the dropdown list below
-    forward_points_dropdown = [{"label": item, "value": item} for item in forward_points_dropdown]
+    forward_points_dropdown = [
+        {"label": item, "value": item} for item in forward_points_dropdown
+    ]
 
     forward_points = forwards.return_points(drop=False)
     dash.callback_context.response.set_cookie(
-        "fw points",
-        json.dumps(fw_points_global, indent=4)
+        "fw points", json.dumps(fw_points_global, indent=4)
     )
 
     forwards = forwards.plot()
@@ -590,10 +593,10 @@ def update_output(
     [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
-        clicks,
-        val_bw,
-        # selected_section,
-        link,
+    clicks,
+    val_bw,
+    # selected_section,
+    link,
 ):
     global art_link_bw
     global bw_points_global
