@@ -20,9 +20,6 @@ bw_dropdown_value = ""
 
 # resp = flask.make_response()
 sess = requests.session()
-print("printing cookies first time...")
-print(sess.cookies)
-
 forward_points_dropdown_cookie = requests.cookies.create_cookie(
     "forward_points_dropdown", []
 )
@@ -541,35 +538,22 @@ def update_summary(link):
 @app.callback(
     [
         dash.dependencies.Output("forwards", "figure"),
-        # dash.dependencies.Output("main-article-summary", "children"),
         dash.dependencies.Output("points-fw", "options"),  # I need to rename this
-        # dash.dependencies.Output("fw-points", "data"),  #  and this
-        # dash.dependencies.Output("fw_dropdown_value", "data"),
-        # dash.dependencies.Output("art_link_fw", "data"),
-        # dash.dependencies.Output("summary", "data"),
-        # dash.dependencies.Output("choose-section-forward", "options"),
     ],
     [
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-fw", "value"),
-        # dash.dependencies.Input("fw-points", "data"),
-        # dash.dependencies.Input("fw_dropdown_value", "data"),
         dash.dependencies.Input("art_link_fw", "data"),
-        # dash.dependencies.Input("choose-section-forward", "value"),
     ],
-    # [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
     clicks,
     fw_dropdown_value,  # the value of the option selected in the dropdown for the forwards graph
-    # forward_points,  # the points that were saved in dcc.Store
-    # forward_points_dropdown,  # the list of the options mentioned in the dropdown
     link_saved,  # the link as saved in dcc.Store
 ):
 
     cookies = sess.cookies.get_dict()
     forward_points = cookies["forward_points"]
-    # forward_points_dropdown = cookies["forward_points_dropdown"]
 
     forwards = wna(
         link=link_saved,
@@ -604,15 +588,9 @@ def update_output(
     sess.cookies.set_cookie(forward_points_dropdown_cookie)
     sess.cookies.set_cookie(forward_points_cookie)
 
-    print("cookies")
-
-    print(sess.cookies)
-    print(sess.cookies.get_dict())
     return (
         forwards,  # the figure
-        forward_points_dropdown,  # points for the dropdown
-        # forward_points_updated,  # complete points package, stored in dcc.Store
-        # fw_dropdown_value,  # the value of the dropdown selected, to be saved in dcc.Store
+        forward_points_dropdown,  # points for the dropdow
     )
 
 
