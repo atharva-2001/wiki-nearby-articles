@@ -10,13 +10,13 @@ from wikinearbyarticles.bin.wna import wna
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
-fw_points_global = {}
+# fw_points_global = {}
 bw_points_global = {}
 art_link_bw = ""
-art_link_fw = ""
+# art_link_fw = ""
 bw_dropdown_value = ""
-fw_dropdown_value = ""
-summary = ""
+# fw_dropdown_value = ""
+# summary = ""
 
 external_stylesheets = [
     "https://codepen.io/chriddyp/pen/bWLwgP.css",
@@ -473,16 +473,67 @@ def toggle_modal(n1, n2, is_open):
     return is_open
 
 
+# this stores the link in dcc.Store, the link is for forwards callback (ugh I dont like this)
+@app.callback(
+    dash.dependencies.Output("art_link_fw", "data"),
+    dash.dependencies.Input("submit", "n_clicks"),
+    [dash.dependencies.State("art_link", "value")],
+)
+def save_link(n_clicks, link):
+    # should I save stuff here?
+    return link
+
+
+# this stores link in dcc.Store for backwards graph
+@app.callback(
+    dash.dependencies.Output("art_link_bw", "data"),
+    dash.dependencies.Input("submit", "n_clicks"),
+    [dash.dependencies.State("art_link", "value")],
+)
+def save_link(n_clicks, link):
+    # should I save stuff here?
+    return link
+
+
+@app.callback(
+    # dash.dependencies.Output("summary", "data"), #  why should summary be saved?
+    dash.dependencies.Output("main-article-summary", "children"),
+    dash.dependencies.Input(
+        "art_link_fw", "data"
+    ),  # updating summary from saved article link
+)
+def update_summary(link):
+    summary_callback = None
+    title = link.split("/")[-1]
+    S = requests.Session()
+    URL = "https://en.wikipedia.org/w/api.php"
+    PARAMS = {
+        "action": "query",
+        "format": "json",
+        "titles": title,
+        "prop": "extracts",
+        "exsentences": "5",
+        "exlimit": "1",
+        "explaintext": "1",
+        "formatversion": "2",
+    }
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+    summary_callback = DATA["query"]["pages"][0]["extract"]
+
+    return summary_callback
+
+
 # this callback will only work when the article link is changed
 @app.callback(
     [
         dash.dependencies.Output("forwards", "figure"),
-        dash.dependencies.Output("main-article-summary", "children"),
-        dash.dependencies.Output("points-fw", "options"),
-        dash.dependencies.Output("fw-points", "data"),
+        # dash.dependencies.Output("main-article-summary", "children"),
+        dash.dependencies.Output("points-fw", "options"),  # I need to rename this
+        dash.dependencies.Output("fw-points", "data"),  #  and this
         dash.dependencies.Output("fw_dropdown_value", "data"),
-        dash.dependencies.Output("art_link_fw", "data"),
-        dash.dependencies.Output("summary", "data"),
+        # dash.dependencies.Output("art_link_fw", "data"),
+        # dash.dependencies.Output("summary", "data"),
         # dash.dependencies.Output("choose-section-forward", "options"),
     ],
     [
@@ -491,56 +542,17 @@ def toggle_modal(n1, n2, is_open):
         dash.dependencies.Input("fw-points", "data"),
         dash.dependencies.Input("fw_dropdown_value", "data"),
         dash.dependencies.Input("art_link_fw", "data"),
-        dash.dependencies.Input("summary", "data"),
         # dash.dependencies.Input("choose-section-forward", "value"),
     ],
     [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
     clicks,
-    val_fw,  # the value of the option selected in the dropdown for the forwards graph
+    fw_dropdown_value,  # the value of the option selected in the dropdown for the forwards graph
     forward_points,  # the points that were saved in dcc.Store
     forward_points_dropdown,  # the list of the options mentioned in the dropdown
     link_saved,  # the link as saved in dcc.Store
-    summary_saved,
-    link,  # the link when the graph updates
 ):
-
-    print("submit", "n_clicks"),
-    print("points-fw", "value"),
-    print("fw-points", "data"),
-    print("fw_dropdown_value", "data"),
-    print("art_link_fw", "data"),
-    print("summary", "data"),
-    # global art_link_fw
-    # global fw_points_global
-    # global fw_dropdown_value
-    # global summary
-
-    # fw_dropdown_value = val_fw
-
-    summary_callback = summary_saved
-    if link_saved != link:
-        forward_points = {}
-        link_saved = link
-        forward_points_dropdown = None
-
-        title = art_link_fw.split("/")[-1]
-        S = requests.Session()
-        URL = "https://en.wikipedia.org/w/api.php"
-        PARAMS = {
-            "action": "query",
-            "format": "json",
-            "titles": title,
-            "prop": "extracts",
-            "exsentences": "5",
-            "exlimit": "1",
-            "explaintext": "1",
-            "formatversion": "2",
-        }
-        R = S.get(url=URL, params=PARAMS)
-        DATA = R.json()
-        summary_callback = DATA["query"]["pages"][0]["extract"]
 
     forwards = wna(
         link=link_saved,
@@ -553,29 +565,25 @@ def update_output(
     forwards.collect_points(center=fw_dropdown_value)
 
     # drop is True specifies that the points to return should be returned for the dropdown
-    forward_points_dropdown, section = forwards.return_points(drop=True)
+    forward_points_dropdown_updated, section = forwards.return_points(drop=True)
 
     # generating items for the dropdown list below
     forward_points_dropdown = [
         {"label": item, "value": item} for item in forward_points_dropdown
     ]
 
-    forward_points = forwards.return_points(drop=False)
-    dash.callback_context.response.set_cookie(
-        "fw points", json.dumps(fw_points_global, indent=4)
-    )
+    forward_points_updated = forwards.return_points(drop=False)
 
     forwards = forwards.plot()
     forwards["layout"] = net_layout
 
+    if forward_points_dropdown_updated == forward_points_dropdown:
+        print("caught")
     return (
         forwards,  # the figure
-        summary_callback,  # the summary to be updated, this shouldn't be updated in every callback
-        forward_points_dropdown,  # points for the dropdown
-        forward_points,  # complete points package, stored in dcc.Store
-        fw_dropdown_value,  # the value of the dropdown selected
-        link_saved,  # the value of the link which is stored in dcc.Store
-        summary_saved,  # summary stored in dcc.Store
+        forward_points_dropdown_updated,  # points for the dropdown
+        forward_points_updated,  # complete points package, stored in dcc.Store
+        fw_dropdown_value,  # the value of the dropdown selected, to be saved in dcc.Store
     )
 
 
@@ -686,7 +694,7 @@ def show_hover_text(data):
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host, port=3004)
+    app.run_server(debug=debug, host=host, port=9001)
 
 
 if __name__ == "__main__":
