@@ -18,6 +18,19 @@ bw_dropdown_value = ""
 # fw_dropdown_value = ""
 # summary = ""
 
+# resp = flask.make_response()
+sess = requests.session()
+print("printing cookies first time...")
+print(sess.cookies)
+
+forward_points_dropdown_cookie = requests.cookies.create_cookie(
+    "forward_points_dropdown", []
+)
+forward_points_cookie = requests.cookies.create_cookie("forward_points", {})
+
+sess.cookies.set_cookie(forward_points_dropdown_cookie)
+sess.cookies.set_cookie(forward_points_cookie)
+
 external_stylesheets = [
     "https://codepen.io/chriddyp/pen/bWLwgP.css",
     dbc.themes.BOOTSTRAP,
@@ -530,8 +543,8 @@ def update_summary(link):
         dash.dependencies.Output("forwards", "figure"),
         # dash.dependencies.Output("main-article-summary", "children"),
         dash.dependencies.Output("points-fw", "options"),  # I need to rename this
-        dash.dependencies.Output("fw-points", "data"),  #  and this
-        dash.dependencies.Output("fw_dropdown_value", "data"),
+        # dash.dependencies.Output("fw-points", "data"),  #  and this
+        # dash.dependencies.Output("fw_dropdown_value", "data"),
         # dash.dependencies.Output("art_link_fw", "data"),
         # dash.dependencies.Output("summary", "data"),
         # dash.dependencies.Output("choose-section-forward", "options"),
@@ -539,20 +552,24 @@ def update_summary(link):
     [
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-fw", "value"),
-        dash.dependencies.Input("fw-points", "data"),
-        dash.dependencies.Input("fw_dropdown_value", "data"),
+        # dash.dependencies.Input("fw-points", "data"),
+        # dash.dependencies.Input("fw_dropdown_value", "data"),
         dash.dependencies.Input("art_link_fw", "data"),
         # dash.dependencies.Input("choose-section-forward", "value"),
     ],
-    [dash.dependencies.State("art_link", "value")],
+    # [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
     clicks,
     fw_dropdown_value,  # the value of the option selected in the dropdown for the forwards graph
-    forward_points,  # the points that were saved in dcc.Store
-    forward_points_dropdown,  # the list of the options mentioned in the dropdown
+    # forward_points,  # the points that were saved in dcc.Store
+    # forward_points_dropdown,  # the list of the options mentioned in the dropdown
     link_saved,  # the link as saved in dcc.Store
 ):
+
+    cookies = sess.cookies.get_dict()
+    forward_points = cookies["forward_points"]
+    # forward_points_dropdown = cookies["forward_points_dropdown"]
 
     forwards = wna(
         link=link_saved,
@@ -565,25 +582,37 @@ def update_output(
     forwards.collect_points(center=fw_dropdown_value)
 
     # drop is True specifies that the points to return should be returned for the dropdown
-    forward_points_dropdown_updated, section = forwards.return_points(drop=True)
+    forward_points_dropdown, section = forwards.return_points(drop=True)
 
     # generating items for the dropdown list below
     forward_points_dropdown = [
         {"label": item, "value": item} for item in forward_points_dropdown
     ]
 
-    forward_points_updated = forwards.return_points(drop=False)
+    forward_points = forwards.return_points(drop=False)
 
     forwards = forwards.plot()
     forwards["layout"] = net_layout
 
-    if forward_points_dropdown_updated == forward_points_dropdown:
-        print("caught")
+    forward_points_dropdown_cookie = requests.cookies.create_cookie(
+        "forward_points_dropdown", forward_points_dropdown
+    )
+    forward_points_cookie = requests.cookies.create_cookie(
+        "forward_points", forward_points
+    )
+
+    sess.cookies.set_cookie(forward_points_dropdown_cookie)
+    sess.cookies.set_cookie(forward_points_cookie)
+
+    print("cookies")
+
+    print(sess.cookies)
+    print(sess.cookies.get_dict())
     return (
         forwards,  # the figure
-        forward_points_dropdown_updated,  # points for the dropdown
-        forward_points_updated,  # complete points package, stored in dcc.Store
-        fw_dropdown_value,  # the value of the dropdown selected, to be saved in dcc.Store
+        forward_points_dropdown,  # points for the dropdown
+        # forward_points_updated,  # complete points package, stored in dcc.Store
+        # fw_dropdown_value,  # the value of the dropdown selected, to be saved in dcc.Store
     )
 
 
@@ -694,7 +723,7 @@ def show_hover_text(data):
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host, port=9001)
+    app.run_server(debug=debug, host=host, port=9002)
 
 
 if __name__ == "__main__":
