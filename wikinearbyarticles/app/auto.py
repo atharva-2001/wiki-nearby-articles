@@ -52,7 +52,7 @@ net_layout = {
 }
 
 
-def random_cluster_center(points): # Shadows name points in outer scope
+def random_cluster_center(points):  # Shadows name points in outer scope
     filtered_points = []
     if points != {}:
         points = points[0]

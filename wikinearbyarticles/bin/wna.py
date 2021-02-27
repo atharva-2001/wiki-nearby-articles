@@ -236,7 +236,7 @@ class wna:
 
             if not self.plot_all_points:
                 points = [
-                    points[i: i + self.points_in_one_plot]
+                    points[i : i + self.points_in_one_plot]
                     for i in range(0, len(points), self.points_in_one_plot)
                 ][plot_index]
 
