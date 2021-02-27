@@ -15,18 +15,25 @@ bw_points_global = {}
 art_link_bw = ""
 # art_link_fw = ""
 bw_dropdown_value = ""
-# fw_dropdown_value = ""
-# summary = ""
 
-# resp = flask.make_response()
 sess = requests.session()
+
 forward_points_dropdown_cookie = requests.cookies.create_cookie(
     "forward_points_dropdown", []
 )
 forward_points_cookie = requests.cookies.create_cookie("forward_points", {})
 
+
+backwards_points_dropdown_cookie = requests.cookies.create_cookie(
+    "backwards_points_dropdown", []
+)
+backwards_points_cookie = requests.cookies.create_cookie("backwards_points", {})
+
 sess.cookies.set_cookie(forward_points_dropdown_cookie)
 sess.cookies.set_cookie(forward_points_cookie)
+
+sess.cookies.set_cookie(backwards_points_dropdown_cookie)
+sess.cookies.set_cookie(backwards_points_cookie)
 
 external_stylesheets = [
     "https://codepen.io/chriddyp/pen/bWLwgP.css",
@@ -603,44 +610,51 @@ def update_output(
     [
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-bw", "value"),
+        dash.dependencies.Input("art_link_bw", "data"),
         # dash.dependencies.Input("choose-section-backward", "value"),
     ],
-    [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
     clicks,
-    val_bw,
+    bw_dropdown_value,  # selected dropdown value for the backwards graph
     # selected_section,
-    link,
+    link_saved,
 ):
-    global art_link_bw
-    global bw_points_global
-    global bw_dropdown_value
-    bw_dropdown_value = val_bw
 
-    if art_link_bw != link:
-        bw_points_global = {}
-        print("seems like link updated...")
-        print("bw points", bw_points_global)
-        art_link_bw = link
-        bw_dropdown_value = None
+    cookies = sess.cookies.get_dict()
+    backwards_points = cookies["backwards_points"]
 
     backwards = wna(
-        link=art_link_bw,
+        link=link_saved,
         prop_params="linkshere",
-        points=bw_points_global,
+        points=backwards_points,
         plot_all_points=False,
     )
     backwards.collect_points(center=bw_dropdown_value)
-    bw_points, section = backwards.return_points(drop=True)
-    bw_points = [{"label": item, "value": item} for item in bw_points]
-    section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
 
-    bw_points_global = backwards.return_points(drop=False)
+    backwards_points_dropdown, section = backwards.return_points(drop=True)
+
+    backwards_points_dropdown = [
+        {"label": item, "value": item} for item in backwards_points_dropdown
+    ]
+
+    # section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
+
+    backwards_points = backwards.return_points(drop=False)
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
 
-    return backwards, bw_points
+    backwards_points_dropdown_cookie = requests.cookies.create_cookie(
+        "backwards_points_dropdown", backwards_points_dropdown
+    )
+    backwards_points_cookie = requests.cookies.create_cookie(
+        "backwards_points", backwards_points
+    )
+
+    sess.cookies.set_cookie(backwards_points_dropdown_cookie)
+    sess.cookies.set_cookie(backwards_points_cookie)
+
+    return backwards, backwards_points_dropdown
 
 
 @app.callback(
