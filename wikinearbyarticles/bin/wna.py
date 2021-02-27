@@ -343,9 +343,9 @@ class wna:
                     y=self.points[cluster_name]["center_coords"][1],
                     z=self.points[cluster_name]["center_coords"][2],
                     text=[cluster_name],
-                    marker=dict(size=5, color=dot_color, opacity=0.5),
-                    mode="markers",
-                    # hoverinfo="text",  # what did this do?
+                    marker=dict(size=12, color=dot_color, opacity=0.5),
+                    mode="markers+text",
+                    hoverinfo="text",  # what did this do?
                 )
             )
             fig.add_trace(
@@ -354,7 +354,7 @@ class wna:
                     y=self.points[cluster_name]["coords"][1],
                     z=self.points[cluster_name]["coords"][2],
                     hovertext=self.points[cluster_name]["point_names"],
-                    marker=dict(size=2, color=dot_color, opacity=0.5),
+                    marker=dict(size=4, color=dot_color, opacity=0.5),
                     mode="markers+text",
                     hoverinfo="text",
                 )

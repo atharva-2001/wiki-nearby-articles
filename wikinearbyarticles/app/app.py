@@ -10,11 +10,7 @@ from wikinearbyarticles.bin.wna import wna
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
-# fw_points_global = {}
-bw_points_global = {}
-art_link_bw = ""
-# art_link_fw = ""
-bw_dropdown_value = ""
+
 
 sess = requests.session()
 
@@ -715,7 +711,7 @@ def show_hover_text(data):
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host, port=9002)
+    app.run_server(debug=debug, host=host, port=9004)
 
 
 if __name__ == "__main__":
