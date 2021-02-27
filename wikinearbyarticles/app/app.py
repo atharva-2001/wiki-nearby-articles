@@ -1,24 +1,35 @@
 import flask
 import dash
+import json
 import dash_core_components as dcc
-from dash.dependencies import Input, State, Output
 import dash_html_components as html
-from dash_html_components.Div import Div
 import dash_gif_component as Gif
 import requests
 import dash_bootstrap_components as dbc
-
 from wikinearbyarticles.bin.wna import wna
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
-fw_points_global = {}
-bw_points_global = {}
-art_link_bw = ""
-art_link_fw = ""
-bw_dropdown_value = ""
-fw_dropdown_value = ""
-summary = ""
+
+
+sess = requests.session()
+
+forward_points_dropdown_cookie = requests.cookies.create_cookie(
+    "forward_points_dropdown", []
+)
+forward_points_cookie = requests.cookies.create_cookie("forward_points", {})
+
+
+backwards_points_dropdown_cookie = requests.cookies.create_cookie(
+    "backwards_points_dropdown", []
+)
+backwards_points_cookie = requests.cookies.create_cookie("backwards_points", {})
+
+sess.cookies.set_cookie(forward_points_dropdown_cookie)
+sess.cookies.set_cookie(forward_points_cookie)
+
+sess.cookies.set_cookie(backwards_points_dropdown_cookie)
+sess.cookies.set_cookie(backwards_points_cookie)
 
 external_stylesheets = [
     "https://codepen.io/chriddyp/pen/bWLwgP.css",
@@ -57,6 +68,17 @@ net_layout = {
 
 app.layout = html.Div(
     [
+        html.Div(
+            [
+                dcc.Store(id="fw-points"),
+                dcc.Store(id="bw-points"),
+                dcc.Store(id="art_link_bw"),
+                dcc.Store(id="art_link_fw"),
+                dcc.Store(id="bw_dropdown_value"),
+                dcc.Store(id="fw_dropdown_value"),
+                dcc.Store(id="summary"),
+            ]
+        ),
         html.Div(
             dbc.Modal(
                 [
@@ -211,7 +233,6 @@ app.layout = html.Div(
                                 "display": "inline-block",
                                 "width": "100%",
                                 "padding-bottom": "8px",
-                                # "box-shadow": " 10px 0px px 0px lightgrey",
                             },
                         ),
                         html.Div(
@@ -452,12 +473,12 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output("help", "is_open"),
+    dash.dependencies.Output("help", "is_open"),
     [
-        Input("open-help", "n_clicks"),
-        Input("close-help", "n_clicks"),
+        dash.dependencies.Input("open-help", "n_clicks"),
+        dash.dependencies.Input("close-help", "n_clicks"),
     ],
-    [State("help", "is_open")],
+    [dash.dependencies.State("help", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
@@ -465,72 +486,115 @@ def toggle_modal(n1, n2, is_open):
     return is_open
 
 
+# this stores the link in dcc.Store, the link is for forwards callback (ugh I dont like this)
+@app.callback(
+    dash.dependencies.Output("art_link_fw", "data"),
+    dash.dependencies.Input("submit", "n_clicks"),
+    [dash.dependencies.State("art_link", "value")],
+)
+def save_link(n_clicks, link):
+    # should I save stuff here?
+    return link
+
+
+# this stores link in dcc.Store for backwards graph
+@app.callback(
+    dash.dependencies.Output("art_link_bw", "data"),
+    dash.dependencies.Input("submit", "n_clicks"),
+    [dash.dependencies.State("art_link", "value")],
+)
+def save_link(n_clicks, link):
+    # should I save stuff here?
+    return link
+
+
+@app.callback(
+    # dash.dependencies.Output("summary", "data"), #  why should summary be saved?
+    dash.dependencies.Output("main-article-summary", "children"),
+    dash.dependencies.Input(
+        "art_link_fw", "data"
+    ),  # updating summary from saved article link
+)
+def update_summary(link):
+    summary_callback = None
+    title = link.split("/")[-1]
+    S = requests.Session()
+    URL = "https://en.wikipedia.org/w/api.php"
+    PARAMS = {
+        "action": "query",
+        "format": "json",
+        "titles": title,
+        "prop": "extracts",
+        "exsentences": "5",
+        "exlimit": "1",
+        "explaintext": "1",
+        "formatversion": "2",
+    }
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+    summary_callback = DATA["query"]["pages"][0]["extract"]
+
+    return summary_callback
+
+
 # this callback will only work when the article link is changed
 @app.callback(
     [
         dash.dependencies.Output("forwards", "figure"),
-        dash.dependencies.Output("main-article-summary", "children"),
-        dash.dependencies.Output("points-fw", "options"),
-        # dash.dependencies.Output("choose-section-forward", "options"),
+        dash.dependencies.Output("points-fw", "options"),  # I need to rename this
     ],
     [
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-fw", "value"),
-        # dash.dependencies.Input("choose-section-forward", "value"),
+        dash.dependencies.Input("art_link_fw", "data"),
     ],
-    [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
     clicks,
-    val_fw,
-    # selected_section,
-    link,
+    fw_dropdown_value,  # the value of the option selected in the dropdown for the forwards graph
+    link_saved,  # the link as saved in dcc.Store
 ):
-    global art_link_fw
-    global fw_points_global
-    global fw_dropdown_value
-    global summary
 
-    fw_dropdown_value = val_fw
-
-    if art_link_fw != link:
-        fw_points_global = {}
-        art_link_fw = link
-        fw_dropdown_value = None
-
-        title = art_link_fw.split("/")[-1]
-        S = requests.Session()
-        URL = "https://en.wikipedia.org/w/api.php"
-        PARAMS = {
-            "action": "query",
-            "format": "json",
-            "titles": title,
-            "prop": "extracts",
-            "exsentences": "5",
-            "exlimit": "1",
-            "explaintext": "1",
-            "formatversion": "2",
-        }
-        R = S.get(url=URL, params=PARAMS)
-        DATA = R.json()
-        summary = DATA["query"]["pages"][0]["extract"]
+    cookies = sess.cookies.get_dict()
+    forward_points = cookies["forward_points"]
 
     forwards = wna(
-        link=art_link_fw,
+        link=link_saved,
         prop_params="links",
-        points=fw_points_global,
-        plot_all_points=False,
+        points=forward_points,
+        plot_all_points=False,  # this plots a limited number of points, the number can be limited too
     )
-    forwards.collect_points(center=fw_dropdown_value)
-    fw_points, section = forwards.return_points(drop=True)
-    fw_points = [{"label": item, "value": item} for item in fw_points]
-    # section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
 
-    fw_points_global = forwards.return_points(drop=False)
+    # this sets the center of the new cluster to be formed
+    forwards.collect_points(center=fw_dropdown_value)
+
+    # drop is True specifies that the points to return should be returned for the dropdown
+    forward_points_dropdown, section = forwards.return_points(drop=True)
+
+    # generating items for the dropdown list below
+    forward_points_dropdown = [
+        {"label": item, "value": item} for item in forward_points_dropdown
+    ]
+
+    forward_points = forwards.return_points(drop=False)
+
     forwards = forwards.plot()
     forwards["layout"] = net_layout
 
-    return (forwards, summary, fw_points)
+    forward_points_dropdown_cookie = requests.cookies.create_cookie(
+        "forward_points_dropdown", forward_points_dropdown
+    )
+    forward_points_cookie = requests.cookies.create_cookie(
+        "forward_points", forward_points
+    )
+
+    sess.cookies.set_cookie(forward_points_dropdown_cookie)
+    sess.cookies.set_cookie(forward_points_cookie)
+
+    return (
+        forwards,  # the figure
+        forward_points_dropdown,  # points for the dropdow
+    )
 
 
 @app.callback(
@@ -542,45 +606,51 @@ def update_output(
     [
         dash.dependencies.Input("submit", "n_clicks"),
         dash.dependencies.Input("points-bw", "value"),
+        dash.dependencies.Input("art_link_bw", "data"),
         # dash.dependencies.Input("choose-section-backward", "value"),
     ],
-    [dash.dependencies.State("art_link", "value")],
 )
 def update_output(
     clicks,
-    val_bw,
+    bw_dropdown_value,  # selected dropdown value for the backwards graph
     # selected_section,
-    link,
+    link_saved,
 ):
 
-    global art_link_bw
-    global bw_points_global
-    global bw_dropdown_value
-    bw_dropdown_value = val_bw
-
-    if art_link_bw != link:
-        bw_points_global = {}
-        print("seems like link updated...")
-        print("bw points", bw_points_global)
-        art_link_bw = link
-        bw_dropdown_value = None
+    cookies = sess.cookies.get_dict()
+    backwards_points = cookies["backwards_points"]
 
     backwards = wna(
-        link=art_link_bw,
+        link=link_saved,
         prop_params="linkshere",
-        points=bw_points_global,
+        points=backwards_points,
         plot_all_points=False,
     )
     backwards.collect_points(center=bw_dropdown_value)
-    bw_points, section = backwards.return_points(drop=True)
-    bw_points = [{"label": item, "value": item} for item in bw_points]
-    section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
 
-    bw_points_global = backwards.return_points(drop=False)
+    backwards_points_dropdown, section = backwards.return_points(drop=True)
+
+    backwards_points_dropdown = [
+        {"label": item, "value": item} for item in backwards_points_dropdown
+    ]
+
+    # section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
+
+    backwards_points = backwards.return_points(drop=False)
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
 
-    return backwards, bw_points
+    backwards_points_dropdown_cookie = requests.cookies.create_cookie(
+        "backwards_points_dropdown", backwards_points_dropdown
+    )
+    backwards_points_cookie = requests.cookies.create_cookie(
+        "backwards_points", backwards_points
+    )
+
+    sess.cookies.set_cookie(backwards_points_dropdown_cookie)
+    sess.cookies.set_cookie(backwards_points_cookie)
+
+    return backwards, backwards_points_dropdown
 
 
 @app.callback(
@@ -641,7 +711,7 @@ def show_hover_text(data):
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host, port=3004)
+    app.run_server(debug=debug, host=host, port=9004)
 
 
 if __name__ == "__main__":
