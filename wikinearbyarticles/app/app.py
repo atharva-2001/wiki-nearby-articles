@@ -1,3 +1,4 @@
+from os import link
 import flask
 import dash
 import json
@@ -488,24 +489,41 @@ def toggle_modal(n1, n2, is_open):
 
 # this stores the link in dcc.Store, the link is for forwards callback (ugh I dont like this)
 @app.callback(
-    dash.dependencies.Output("art_link_fw", "data"),
+    [
+        dash.dependencies.Output("art_link_fw", "data"),
+        dash.dependencies.Output("art_link_bw", "data"),
+        # dash.dependencies.Output("points-fw", "options"),  # I need to rename this
+        # dash.dependencies.Output("points-bw", "options"),  # I need to rename this
+    ],
     dash.dependencies.Input("submit", "n_clicks"),
     [dash.dependencies.State("art_link", "value")],
 )
 def save_link(n_clicks, link):
     # should I save stuff here?
-    return link
+    print(f"updating saved link...{link}")
+    print("resetting cookies...")
+    forward_points_dropdown_cookie = requests.cookies.create_cookie(
+        "forward_points_dropdown", []
+    )
+    forward_points_cookie = requests.cookies.create_cookie("forward_points", {})
+
+    backwards_points_dropdown_cookie = requests.cookies.create_cookie(
+        "backwards_points_dropdown", []
+    )
+    backwards_points_cookie = requests.cookies.create_cookie("backwards_points", {})
+
+    sess.cookies.set_cookie(forward_points_dropdown_cookie)
+    sess.cookies.set_cookie(forward_points_cookie)
+
+    sess.cookies.set_cookie(backwards_points_dropdown_cookie)
+    sess.cookies.set_cookie(backwards_points_cookie)
+
+    blank_dropdown_options = [{"label": "", "value": ""}]
+
+    return link, link
 
 
 # this stores link in dcc.Store for backwards graph
-@app.callback(
-    dash.dependencies.Output("art_link_bw", "data"),
-    dash.dependencies.Input("submit", "n_clicks"),
-    [dash.dependencies.State("art_link", "value")],
-)
-def save_link(n_clicks, link):
-    # should I save stuff here?
-    return link
 
 
 @app.callback(
@@ -533,6 +551,7 @@ def update_summary(link):
     R = S.get(url=URL, params=PARAMS)
     DATA = R.json()
     summary_callback = DATA["query"]["pages"][0]["extract"]
+    S.close()
 
     return summary_callback
 
@@ -555,6 +574,7 @@ def update_output(
     link_saved,  # the link as saved in dcc.Store
 ):
 
+    print(f"received link  {link_saved} in forward graph's callback")
     cookies = sess.cookies.get_dict()
     forward_points = cookies["forward_points"]
 
@@ -616,7 +636,7 @@ def update_output(
     # selected_section,
     link_saved,
 ):
-
+    print(f"received link  {link_saved} in backward graph's callback")
     cookies = sess.cookies.get_dict()
     backwards_points = cookies["backwards_points"]
 
@@ -711,7 +731,7 @@ def show_hover_text(data):
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host, port=9004)
+    app.run_server(debug=debug, host=host, port=9001)
 
 
 if __name__ == "__main__":
