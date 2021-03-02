@@ -83,22 +83,12 @@ app.layout = html.Div(
             dbc.Modal(
                 [
                     dbc.ModalHeader(
-                        [
-                            html.P(
-                                "Have Patience Please",
-                                style={
-                                    "font-size": "17px",
-                                    "letter-spacing": "2px",
-                                    "text-align": "center",
-                                    "margin": "auto",
-                                },
-                            )
-                        ],
+                        html.Div(html.Img(src="/assets/wrench.png")),
                     ),
                     dbc.ModalBody(
                         [
                             html.P(
-                                "the site takes a couple seconds to load, just hold on :)"
+                                "we're trying to fix some issues and you might see some problems, but don't worry, we're on it"
                             )
                         ],
                         style={"font-size": "14px"},
@@ -711,7 +701,7 @@ def show_hover_text(data):
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host, port=9004)
+    app.run_server(debug=debug, host=host, port=3004)
 
 
 if __name__ == "__main__":
