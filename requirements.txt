@@ -11,3 +11,4 @@ numpy==1.19.5
 plotly==4.14.3
 requests==2.25.1
 dash-gif-component==1.1.0
+ipywidgets==7.4.2
