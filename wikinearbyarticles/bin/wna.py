@@ -122,6 +122,7 @@ class wna:
         self.points_in_one_plot = points_in_one_shot
         self.plot_all_points = plot_all_points
         self.sections = 0
+        self.fig = go.FigureWidget()
         # if the link is updated, the points sent as arguments are already empty dictionaries
         if points != {}:
             self.points = points
@@ -326,10 +327,7 @@ class wna:
     ):
         # * plotting main cluster
 
-        fig = go.Figure()
-
         # plotting the central point
-
         for cluster_name in self.points.keys():
             # adds the center cluster itself
             # though I am not so proud of the code I have written
@@ -337,61 +335,72 @@ class wna:
             # the first trace added just below adds the clusters to the diagram.
             # the trace after that adds the points corresponding to the cluster.
             # points corresponding to that particular cluster, none else.
-            fig.add_trace(
-                go.Scatter3d(
-                    x=self.points[cluster_name]["center_coords"][0],
-                    y=self.points[cluster_name]["center_coords"][1],
-                    z=self.points[cluster_name]["center_coords"][2],
-                    text=[cluster_name],
-                    marker=dict(size=12, color=dot_color, opacity=0.5),
-                    mode="markers+text",
-                    hoverinfo="text",  # what did this do?
+
+            # this adds the cluster center point
+            trace_names = [item.name for item in self.fig.data]
+
+            if cluster_name not in trace_names:
+                self.fig.add_trace(
+                    go.Scatter3d(
+                        x=self.points[cluster_name]["center_coords"][0],
+                        y=self.points[cluster_name]["center_coords"][1],
+                        z=self.points[cluster_name]["center_coords"][2],
+                        name=cluster_name,
+                        text=[cluster_name],
+                        marker=dict(size=12, color=dot_color, opacity=0.5),
+                        mode="markers+text",
+                        hoverinfo="text",  # what did this do?
+                    )
                 )
-            )
-            fig.add_trace(
-                go.Scatter3d(
-                    x=self.points[cluster_name]["coords"][0],
-                    y=self.points[cluster_name]["coords"][1],
-                    z=self.points[cluster_name]["coords"][2],
-                    hovertext=self.points[cluster_name]["point_names"],
-                    marker=dict(size=4, color=dot_color, opacity=0.5),
-                    mode="markers+text",
-                    hoverinfo="text",
+            # this adds the points corresponding to the cluster
+            if cluster_name + "!points" not in trace_names:
+                self.fig.add_trace(
+                    go.Scatter3d(
+                        x=self.points[cluster_name]["coords"][0],
+                        y=self.points[cluster_name]["coords"][1],
+                        z=self.points[cluster_name]["coords"][2],
+                        hovertext=self.points[cluster_name]["point_names"],
+                        marker=dict(size=4, color=dot_color, opacity=0.5),
+                        name=cluster_name + "!points",
+                        mode="markers+text",
+                        hoverinfo="text",
+                    )
                 )
-            )
 
         # this below adds the lines in plot.
         # this is a tough job, and adds a lot of traces to the graph, which consumes a lot of resources.
         # again, maybe there is a better way
         # I did ask this question on plotly community forum, and am yet to recieve a response.
-        for cluster_name in self.points.keys():
-            idx = 0
-            while idx < len(self.points[cluster_name]["point_names"]):
-                fig.add_trace(
-                    go.Scatter3d(
-                        x=[
-                            self.points[cluster_name]["coords"][0][idx],
-                            self.points[cluster_name]["center_coords"][0][0],
-                        ],
-                        y=[
-                            self.points[cluster_name]["coords"][1][idx],
-                            self.points[cluster_name]["center_coords"][1][0],
-                        ],
-                        z=[
-                            self.points[cluster_name]["coords"][2][idx],
-                            self.points[cluster_name]["center_coords"][2][0],
-                        ],
-                        marker=dict(size=0.1, color=line_color),
-                        mode="lines",
-                        hoverinfo="none",
-                    )
-                ),
-                idx += 1
+        if cluster_name + "!lines" not in trace_names:
+            for cluster_name in self.points.keys():
+                idx = 0
+                while idx < len(self.points[cluster_name]["point_names"]):
+                    self.fig.add_trace(
+                        go.Scatter3d(
+                            x=[
+                                self.points[cluster_name]["coords"][0][idx],
+                                self.points[cluster_name]["center_coords"][0][0],
+                            ],
+                            y=[
+                                self.points[cluster_name]["coords"][1][idx],
+                                self.points[cluster_name]["center_coords"][1][0],
+                            ],
+                            z=[
+                                self.points[cluster_name]["coords"][2][idx],
+                                self.points[cluster_name]["center_coords"][2][0],
+                            ],
+                            name=cluster_name + "!lines",
+                            marker=dict(size=0.1, color=line_color),
+                            mode="lines",
+                            hoverinfo="none",
+                        )
+                    ),
+                    idx += 1
 
         # this is pretty simple
         # this fixes the layout. However, I am adding this again to the plot, or redefining the layout in the callback, and thats causing a little trouble too
         # and I will fix it soon too
-        fig.update_layout(
+        self.fig.update_layout(
             height=1200,
             width=800,
             hoverlabel={
@@ -412,5 +421,5 @@ class wna:
                 "b": 0,
             },
         )
-        fig.update_traces(showlegend=False)
-        return fig
+        self.fig.update_traces(showlegend=False)
+        return self.fig
