@@ -24,7 +24,7 @@ net_layout = {
         "font": {"family": "monospace"},
     },
     # "template": "plotly_dark",
-    "font": {"family": "monospace", "size": 18},
+    "font": {"family": "monospace", "size": 10},
     "scene": {
         "xaxis": {
             # "range": [-50, 50],

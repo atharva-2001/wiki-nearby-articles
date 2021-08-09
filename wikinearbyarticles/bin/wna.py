@@ -338,7 +338,15 @@ class wna:
 
             # this adds the cluster center point
             trace_names = [item.name for item in self.fig.data]
-
+            if cluster_name == self.article_name:
+                dot_color_main = "#525BCB"
+                dot_size_main = 17
+                opacity_main = 0.6
+            else:
+                dot_color_main = dot_color
+                dot_size_main = 9
+                opacity_main = 0.6
+                
             if cluster_name not in trace_names:
                 self.fig.add_trace(
                     go.Scatter3d(
@@ -347,7 +355,7 @@ class wna:
                         z=self.points[cluster_name]["center_coords"][2],
                         name=cluster_name,
                         text=[cluster_name],
-                        marker=dict(size=12, color=dot_color, opacity=0.5),
+                        marker=dict(size=dot_size_main, color=dot_color_main, opacity=opacity_main),
                         mode="markers+text",
                         hoverinfo="text",  # what did this do?
                     )
@@ -403,6 +411,10 @@ class wna:
         self.fig.update_layout(
             height=1200,
             width=800,
+            transition= {
+                'duration': 500,
+                'easing': 'cubic-in-out'
+            }, 
             hoverlabel={
                 "font": {"family": "monospace"},
             },
