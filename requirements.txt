@@ -12,3 +12,5 @@ plotly==4.14.3
 requests==2.25.1
 dash-gif-component==1.1.0
 ipywidgets==7.4.2
+notebook>=6.1.5 # not directly required, pinned by Snyk to avoid a vulnerability
+pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
