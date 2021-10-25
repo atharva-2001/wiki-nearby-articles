@@ -6,7 +6,7 @@ import dash_html_components as html
 import dash_gif_component as Gif
 import requests
 import dash_bootstrap_components as dbc
-from wikinearbyarticles.bin.wna import wna
+from wikinearbyarticles.bin.wna import WNA
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
@@ -548,7 +548,7 @@ def update_output(
     cookies = sess.cookies.get_dict()
     forward_points = cookies["forward_points"]
 
-    forwards = wna(
+    forwards = WNA(
         link=link_saved,
         prop_params="links",
         points=forward_points,
@@ -610,7 +610,7 @@ def update_output(
     cookies = sess.cookies.get_dict()
     backwards_points = cookies["backwards_points"]
 
-    backwards = wna(
+    backwards = WNA(
         link=link_saved,
         prop_params="linkshere",
         points=backwards_points,
@@ -658,7 +658,7 @@ def show_hover_text(data):
             print("hovering on point ", end="")
             art_name = data["hovertext"]
             print(art_name)
-            wna_hover = wna(link=art_name, prop_params="links")
+            wna_hover = WNA(link=art_name, prop_params="links")
             hover = wna_hover.article_summary_for_hover(
                 collect_points=False, number_of_lines=8
             )
@@ -686,7 +686,7 @@ def show_hover_text(data):
             print("hovering on point ", end="")
             art_name = data["hovertext"]
             print(art_name)
-            wna_hover = wna(link=art_name, prop_params="linkshere")
+            wna_hover = WNA(link=art_name, prop_params="linkshere")
             hover = wna_hover.article_summary_for_hover(
                 collect_points=False, number_of_lines=8
             )
@@ -701,7 +701,7 @@ def show_hover_text(data):
 
 
 def run(host="127.0.0.1", debug=True):
-    app.run_server(debug=debug, host=host, port=3004)
+    app.run_server(debug=debug, host=host, port=50000)
 
 
 if __name__ == "__main__":
