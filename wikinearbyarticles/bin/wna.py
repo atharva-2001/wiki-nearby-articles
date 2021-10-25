@@ -87,43 +87,33 @@ class WNA:
             self.points = self.points[0]
 
         if self.article_name not in self.points.keys():
-            # S = requests.Session()
-            # URL = "https://en.wikipedia.org/w/api.php"
-
-            # PARAMS = {
-            #     "action": "query",
-            #     "format": "json",
-            #     "titles": self.article_name,
-            #     "prop": self.prop_params,
-            #     "pllimit": "max",
-            # }
-
-            # R = S.get(url=URL, params=PARAMS)
-            # DATA = R.json()
-
             DATA = call_mediawiki_api(titles=self.article_name, prop=self.prop_params)
             PAGES = DATA["query"]["pages"][0]
-            points = []
+            new_cluster_point_names = []
 
-            # for k, v in PAGES.items():
-            #     print(k, v)
             for l in PAGES[self.prop_params]:  # TODO: better variable names here
-                points.append(l["title"])
-            # print(json.dumps(points, sort_keys=True, indent=4))
+                new_cluster_point_names.append(l["title"])
+
             # TODO: what does this do?
             if not self.plot_all_points:
-                points = [
-                    points[i : i + self.points_in_one_plot]
-                    for i in range(0, len(points), self.points_in_one_plot)
+                new_cluster_point_names = [
+                    new_cluster_point_names[i : i + self.points_in_one_plot]
+                    for i in range(
+                        0, len(new_cluster_point_names), self.points_in_one_plot
+                    )
                 ]
-                self.sections = len(points)
+                self.sections = len(new_cluster_point_names)
                 if plot_index is None:
                     plot_index = 0
-                points = points[plot_index]
+                new_cluster_point_names = new_cluster_point_names[plot_index]
 
             # center is origin
-            coords = random_points_in_a_sphere(num=len(points), radius=5)
-            orgin_cluster_coords = random_points_in_a_sphere(num=len(points), radius=5)
+            new_cluster_point_coords = random_points_in_a_sphere(
+                num=len(new_cluster_point_names), radius=5
+            )
+            orgin_cluster_coords = random_points_in_a_sphere(
+                num=len(new_cluster_point_names), radius=5
+            )
 
             self.points[self.article_name] = {
                 "cluster_origin": self.article_name,
@@ -132,7 +122,7 @@ class WNA:
                     "y": 0,
                     "z": 0,
                 },
-                "point_names": points,
+                "point_names": new_cluster_point_names,
                 "coords": orgin_cluster_coords,
             }
 
@@ -157,6 +147,7 @@ class WNA:
                             "y": self.points[key]["center_coords"]["y"],
                             "z": self.points[key]["center_coords"]["z"],
                         }
+
                         center_coords = extend_points(
                             tip=cluster_origin_coords, end=center_coords, factor=4.5
                         )
@@ -171,33 +162,25 @@ class WNA:
                 if if_break:
                     break
 
-            S = requests.Session()
-            URL = "https://en.wikipedia.org/w/api.php"
+            new_cluster_point_names_raw = call_mediawiki_api(
+                titles=center, prop=self.prop_params
+            )["query"]["pages"][0]
 
-            PARAMS = {
-                "action": "query",
-                "format": "json",
-                "titles": center,
-                "prop": self.prop_params,
-                "pllimit": "max",
-            }
+            new_cluster_point_names = []
 
-            R = S.get(url=URL, params=PARAMS)
-            DATA = R.json()
-            PAGES = DATA["query"]["pages"]
-            points = []
-            for k, v in PAGES.items():
-                for l in v[self.prop_params]:
-                    points.append(l["title"])
+            for l in new_cluster_point_names_raw[self.prop_params]:
+                new_cluster_point_names.append(l["title"])
 
             if not self.plot_all_points:
-                points = [
-                    points[i : i + self.points_in_one_plot]
-                    for i in range(0, len(points), self.points_in_one_plot)
+                new_cluster_point_names = [
+                    new_cluster_point_names[i : i + self.points_in_one_plot]
+                    for i in range(
+                        0, len(new_cluster_point_names), self.points_in_one_plot
+                    )
                 ][plot_index]
 
-            coords = random_points_in_a_sphere(
-                num=len(points),
+            new_cluster_point_coords = random_points_in_a_sphere(
+                num=len(new_cluster_point_names),
                 radius=5,
                 h=center_coords["x"],
                 g=center_coords["y"],
@@ -207,11 +190,9 @@ class WNA:
             self.points[center] = {
                 "center_coords": center_coords,
                 "cluster_origin": cluster_origin,
-                "point_names": points,
-                "coords": coords,
+                "point_names": new_cluster_point_names,
+                "coords": new_cluster_point_coords,
             }
-
-        # return self.points
 
     def return_points(self, drop=True):
         """
@@ -241,35 +222,21 @@ class WNA:
                 self.points = self.points[plot_index]
 
         if display_all_summaries:
-            S = requests.Session()
-            URL = "https://en.wikipedia.org/w/api.php"
-
             hover_text = []
-
             for point in self.points:
-                PARAMS = {
-                    "action": "query",
-                    "format": "json",
-                    "titles": point,
-                    "prop": "extracts",
-                    "exsentences": number_of_lines,
-                    "exlimit": "1",
-                    "explaintext": "1",
-                    "formatversion": "2",
-                }
-
-                R = S.get(url=URL, params=PARAMS)
-                DATA = R.json()
+                DATA = call_mediawiki_api(
+                    titles=point,
+                    exsentences=number_of_lines,
+                )
                 hover_text_for_one_point = find_hover_text(
                     DATA["query"]["pages"][0]["extract"]
                 )
                 hover_text.append(hover_text_for_one_point)
 
-            # ! do you want summary of the article selected?s
             self.hover_text = hover_text
         else:
             # print(f"trying to get hover text for {self.article_name}")
-            return get_calls(article_name=self.article_name)
+            return call_mediawiki_api(titles=self.article_name)
 
     def plot(
         self,

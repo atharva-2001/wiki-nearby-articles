@@ -94,7 +94,17 @@ def find_hover_text(output_data):
     return hover_data
 
 
-def get_calls(article_name, number_of_lines=7):
+def call_mediawiki_api(
+    titles,
+    action="query",
+    format_="json",
+    prop="extracts",
+    exsentences="7",
+    exlimit="1",
+    explaintext="1",
+    formatversion="2",
+    pllimit="max",
+):
     """
     Call MediaWiki API.
 
@@ -109,39 +119,6 @@ def get_calls(article_name, number_of_lines=7):
     -------
     data: str
         Output of the API call.
-    """
-    S = requests.Session()
-    URL = "https://en.wikipedia.org/w/api.php"
-
-    PARAMS = {
-        "action": "query",
-        "format": "json",
-        "titles": article_name,
-        "prop": "extracts",
-        "exsentences": number_of_lines,
-        "exlimit": "1",
-        "explaintext": "1",
-        "formatversion": "2",
-    }
-    R = S.get(url=URL, params=PARAMS)
-    data = R.json()
-    sys.stdout.flush()
-    return data
-
-
-def call_mediawiki_api(
-    titles,
-    action="query",
-    format_="json",
-    prop="extracts",
-    exsentences="7",
-    exlimit="1",
-    explaintext="1",
-    formatversion="2",
-    pllimit="max",
-):
-    """
-    Call MediaWiki API.
     """
 
     S = requests.Session()
@@ -160,4 +137,5 @@ def call_mediawiki_api(
     }
     R = S.get(url=URL, params=PARAMS)
     data = R.json()
+    S.close()
     return data

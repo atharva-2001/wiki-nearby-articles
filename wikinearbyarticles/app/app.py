@@ -7,6 +7,7 @@ import dash_gif_component as Gif
 import requests
 import dash_bootstrap_components as dbc
 from wikinearbyarticles.bin.wna import WNA
+from wikinearbyarticles.bin.util import call_mediawiki_api
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
@@ -507,23 +508,8 @@ def save_link(n_clicks, link):
 )
 def update_summary(link):
     summary_callback = None
-    title = link.split("/")[-1]
-    S = requests.Session()
-    URL = "https://en.wikipedia.org/w/api.php"
-    PARAMS = {
-        "action": "query",
-        "format": "json",
-        "titles": title,
-        "prop": "extracts",
-        "exsentences": "5",
-        "exlimit": "1",
-        "explaintext": "1",
-        "formatversion": "2",
-    }
-    R = S.get(url=URL, params=PARAMS)
-    DATA = R.json()
-    summary_callback = DATA["query"]["pages"][0]["extract"]
-
+    summary_raw = call_mediawiki_api(titles=link.split("/")[-1], exsentences="5")
+    summary_callback = summary_raw["query"]["pages"][0]["extract"]
     return summary_callback
 
 
