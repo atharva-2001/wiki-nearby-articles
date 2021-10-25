@@ -9,7 +9,7 @@ import dash_gif_component as Gif
 import requests
 import numpy as np
 import dash_bootstrap_components as dbc
-from wikinearbyarticles.bin.wna import wna
+from wikinearbyarticles.bin.wna import WNA
 
 points = {}
 external_stylesheets = [
@@ -147,7 +147,7 @@ app.layout = html.Div(
 def update_data(clicks, n_intervals, link):
     global points
 
-    auto = wna(
+    auto = WNA(
         link=link,
         points_in_one_shot=5,
         prop_params="links",

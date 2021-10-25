@@ -1,68 +1,119 @@
+"""General functions called in the WNA class."""
 import math
 import re
 import sys
 import requests
 import numpy as np
+from collections import defaultdict
 
 def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
     """
-    creates random points in a sphere
-    h,g,f are the coordinates of the center
-    num is the number of points
-    radius is the radius of the sphere
-
-    returns a list having three lists inside of it
-    having x,y,z values respectively
+    Generate random points in a sphere.
+    
+    Parameters
+    ----------
+    h,g,f : int
+        The center of the sphere.
+    num : int
+        The number of points to be generated.
+    radius : int
+        The radius of the sphere.
+        
+    Returns
+    -------
+    coor: defaultdict(list)
+        Dictionary having the coordinates of the points.
     """
-    coor = [[], [], []]
+    coor = [[], [], []] 
+    coor = defaultdict(list)
     index = 0
-    # print("finding random points...")
+    
     while True:
         if index > num - 1:
             break
-
-        x = np.round(np.random.uniform(h + radius, h - radius, (1,))[0], 3)
-        y = np.round(np.random.uniform(g + radius, g - radius, (1,))[0], 3)
-        z = np.round(np.random.uniform(f + radius, f - radius, (1,))[0], 3)
-
+        
+        x = np.random.uniform(h + radius, h - radius)
+        y = np.random.uniform(g + radius, g - radius)
+        z = np.random.uniform(f + radius, f - radius)
+        
         if (
             math.sqrt((x - h) ** 2 + (y - g) ** 2 + (z - f) ** 2) <= radius
-        ):  # checking if the point is in the circle
+        ): 
             if (x != 0) and (y != 0) and (z != 0):
-                coor[0].append(np.round(x, 2))
-                coor[1].append(np.round(y, 2))
-                coor[2].append(np.round(z, 2))
+                coor["x"].append(np.round(x, 2))
+                coor["y"].append(np.round(y, 2))
+                coor["z"].append(np.round(z, 2))
                 index += 1
+    
     return coor
 
 
-def extend_points(tip=[[0], [0], [0]], end=[[0], [0], [0]], factor=2):
+def extend_points(tip={"x":0,"y":0,"z":0}, end={"x":0,"y":0,"z":0}, factor=2):
     """
-    returns new coordinates of the points to extend
-    in a list
-    the default value of tip is the origin
-    end is also a list
+    Generate random points in a sphere.
+    
+    Parameters
+    ----------
+    tip : list
+        Coordinates of the starting point. Default [0,0,0]
+    end : list
+        Coordinates of the ending point.
+    factor : int
+        The factor by which the points are to be extended.        
+    
+    Returns
+    -------
+    new_coords: list
+        Extended coordinates of the ending point.
     """
-    # print("extending coords...")
-    xnew = factor * (end[0][0] - tip[0][0]) + tip[0][0]
-    ynew = factor * (end[1][0] - tip[1][0]) + tip[1][0]
-    znew = factor * (end[2][0] - tip[2][0]) + tip[2][0]
+    xnew = factor * (end["x"] - tip["x"]) + tip["x"]
+    ynew = factor * (end["y"] - tip["y"]) + tip["y"]
+    znew = factor * (end["z"] - tip["z"]) + tip["z"]
+    new_coords = [xnew, ynew, znew]
+    
+    new_coords = {
+        "x": xnew,
+        "y": ynew,
+        "z": znew
+    }
+    return new_coords
 
-    return [[xnew], [ynew], [znew]]
 
+def find_hover_text(output_data):
+    """
+    Parse the hover text from the API output.
+    
+    Parameters
+    ----------
+    output_data : str
+        Raw API output.
 
-def find_hover_text(str):
-    lst = re.split(" ", str)
-    lst = [" ".join(lst[i : i + 3]) for i in range(0, len(lst), 3)]
-    str = "<br>".join(["".join(item) for item in lst])
-    return str
+    Returns
+    -------
+    hover_data: str
+        Parsed hover data.
+    """
+    output_lst = re.split(" ", output_data)
+    output_lst = [" ".join(output_lst[i : i + 3]) for i in range(0, len(output_lst), 3)]
+    hover_data = "<br>".join(["".join(item) for item in output_lst])
+    return hover_data
 
 
 def get_calls(article_name, number_of_lines=7):
     """
-    returns hover data in raw format
-    this is used in app callbacks to display hover summary data in a text box
-    just enter article name like "Atom" or "Proton"
+    Call MediaWiki API.
+    
+    Parameters
+    ----------
+    article_name : str
+        Name of the wikipedia article. 
+    number_of_lines : int
+        Number of exsentences to be returned from the API. Default: 7.
+    
+    Returns
+    -------
+    data: str
+        Output of the API call.
     """
     S = requests.Session()
     URL = "https://en.wikipedia.org/w/api.php"
@@ -78,6 +129,39 @@ def get_calls(article_name, number_of_lines=7):
         "formatversion": "2",
     }
     R = S.get(url=URL, params=PARAMS)
-    DATA = R.json()
+    data = R.json()
     sys.stdout.flush()
-    return DATA
+    return data
+
+def call_mediawiki_api(
+    titles,
+    action="query",
+    format_="json",
+    prop="extracts",
+    exsentences="7",
+    exlimit="1",
+    explaintext="1",
+    formatversion="2",
+    pllimit="max"
+):
+    """
+    Call MediaWiki API.
+    """
+    
+    S = requests.Session()
+    URL = "https://en.wikipedia.org/w/api.php"
+
+    PARAMS = {
+        "action": action,
+        "format": format_,
+        "titles": titles,
+        "prop": prop,
+        "exsentences": exsentences,
+        "exlimit": exlimit,
+        "explaintext": explaintext,
+        "formatversion": formatversion,
+        "pllimit": pllimit
+    }
+    R = S.get(url=URL, params=PARAMS)
+    data = R.json()
+    return data
