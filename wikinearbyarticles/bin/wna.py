@@ -4,9 +4,10 @@ import requests
 from .util import *
 import json
 
+
 class WNA:
     """WNA class."""
-    
+
     def __init__(
         self, link, prop_params, points_in_one_shot=36, points={}, plot_all_points=None
     ):
@@ -84,7 +85,7 @@ class WNA:
 
         if self.points != {}:
             self.points = self.points[0]
-        
+
         if self.article_name not in self.points.keys():
             # S = requests.Session()
             # URL = "https://en.wikipedia.org/w/api.php"
@@ -99,17 +100,14 @@ class WNA:
 
             # R = S.get(url=URL, params=PARAMS)
             # DATA = R.json()
-            
-            DATA = call_mediawiki_api(
-                titles=self.article_name,
-                prop=self.prop_params
-            )
+
+            DATA = call_mediawiki_api(titles=self.article_name, prop=self.prop_params)
             PAGES = DATA["query"]["pages"][0]
             points = []
-            
+
             # for k, v in PAGES.items():
             #     print(k, v)
-            for l in PAGES[self.prop_params]: # TODO: better variable names here
+            for l in PAGES[self.prop_params]:  # TODO: better variable names here
                 points.append(l["title"])
             # print(json.dumps(points, sort_keys=True, indent=4))
             # TODO: what does this do?
@@ -124,45 +122,40 @@ class WNA:
                 points = points[plot_index]
 
             # center is origin
-            coords = random_points_in_a_sphere(
-                num=len(points), radius=5
-            )
-            orgin_cluster_coords = random_points_in_a_sphere(
-                num=len(points), radius=5
-            )
+            coords = random_points_in_a_sphere(num=len(points), radius=5)
+            orgin_cluster_coords = random_points_in_a_sphere(num=len(points), radius=5)
 
             self.points[self.article_name] = {
                 "cluster_origin": self.article_name,
                 "center_coords": {
-                        "x":0,
-                        "y":0,
-                        "z":0,
-                    },
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                },
                 "point_names": points,
                 "coords": orgin_cluster_coords,
             }
-            
+
         # TODO: what does this do
         center_coords = []
         cluster_origin = ""
         if_break = False
-        
+
         if center != "" and center is not None:
             for key in self.points.keys():
                 for name in self.points[key]["point_names"]:
                     if name == center:
                         idx = self.points[key]["point_names"].index(name)
                         center_coords = {
-                            "x":self.points[key]["coords"]["x"][idx],
-                            "y":self.points[key]["coords"]["y"][idx],
-                            "z":self.points[key]["coords"]["z"][idx],                         
+                            "x": self.points[key]["coords"]["x"][idx],
+                            "y": self.points[key]["coords"]["y"][idx],
+                            "z": self.points[key]["coords"]["z"][idx],
                         }
 
                         cluster_origin_coords = {
-                            "x":self.points[key]["center_coords"]["x"],
-                            "y":self.points[key]["center_coords"]["y"],
-                            "z":self.points[key]["center_coords"]["z"],
-                                                        
+                            "x": self.points[key]["center_coords"]["x"],
+                            "y": self.points[key]["center_coords"]["y"],
+                            "z": self.points[key]["center_coords"]["z"],
                         }
                         center_coords = extend_points(
                             tip=cluster_origin_coords, end=center_coords, factor=4.5
@@ -173,7 +166,7 @@ class WNA:
                         self.points[key]["coords"]["z"][idx] = center_coords["z"]
 
                         cluster_origin = key
-                        if_break = True # TODO: can this be avoided?
+                        if_break = True  # TODO: can this be avoided?
                         break
                 if if_break:
                     break
@@ -309,7 +302,7 @@ class WNA:
                 dot_color_main = dot_color
                 dot_size_main = 9
                 opacity_main = 0.6
-                
+
             if cluster_name not in trace_names:
                 self.fig.add_trace(
                     go.Scatter3d(
@@ -318,7 +311,11 @@ class WNA:
                         z=[self.points[cluster_name]["center_coords"]["z"]],
                         name=cluster_name,
                         text=[cluster_name],
-                        marker=dict(size=dot_size_main, color=dot_color_main, opacity=opacity_main),
+                        marker=dict(
+                            size=dot_size_main,
+                            color=dot_color_main,
+                            opacity=opacity_main,
+                        ),
                         mode="markers+text",
                         hoverinfo="text",  # what did this do?
                     )
@@ -369,17 +366,14 @@ class WNA:
                     idx += 1
 
         # this is pretty simple
-        # this fixes the layout. However, I am adding 
-        # this again to the plot, or redefining the layout in the callback, 
+        # this fixes the layout. However, I am adding
+        # this again to the plot, or redefining the layout in the callback,
         # and thats causing a little trouble too
         # and I will fix it soon too
         self.fig.update_layout(
             height=1200,
             width=800,
-            transition= {
-                'duration': 500,
-                'easing': 'cubic-in-out'
-            }, 
+            transition={"duration": 500, "easing": "cubic-in-out"},
             hoverlabel={
                 "font": {"family": "monospace"},
             },

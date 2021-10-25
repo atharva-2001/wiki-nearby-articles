@@ -6,10 +6,11 @@ import requests
 import numpy as np
 from collections import defaultdict
 
+
 def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
     """
     Generate random points in a sphere.
-    
+
     Parameters
     ----------
     h,g,f : int
@@ -18,40 +19,38 @@ def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
         The number of points to be generated.
     radius : int
         The radius of the sphere.
-        
+
     Returns
     -------
     coor: defaultdict(list)
         Dictionary having the coordinates of the points.
     """
-    coor = [[], [], []] 
+    coor = [[], [], []]
     coor = defaultdict(list)
     index = 0
-    
+
     while True:
         if index > num - 1:
             break
-        
+
         x = np.random.uniform(h + radius, h - radius)
         y = np.random.uniform(g + radius, g - radius)
         z = np.random.uniform(f + radius, f - radius)
-        
-        if (
-            math.sqrt((x - h) ** 2 + (y - g) ** 2 + (z - f) ** 2) <= radius
-        ): 
+
+        if math.sqrt((x - h) ** 2 + (y - g) ** 2 + (z - f) ** 2) <= radius:
             if (x != 0) and (y != 0) and (z != 0):
                 coor["x"].append(np.round(x, 2))
                 coor["y"].append(np.round(y, 2))
                 coor["z"].append(np.round(z, 2))
                 index += 1
-    
+
     return coor
 
 
-def extend_points(tip={"x":0,"y":0,"z":0}, end={"x":0,"y":0,"z":0}, factor=2):
+def extend_points(tip={"x": 0, "y": 0, "z": 0}, end={"x": 0, "y": 0, "z": 0}, factor=2):
     """
     Generate random points in a sphere.
-    
+
     Parameters
     ----------
     tip : list
@@ -59,8 +58,8 @@ def extend_points(tip={"x":0,"y":0,"z":0}, end={"x":0,"y":0,"z":0}, factor=2):
     end : list
         Coordinates of the ending point.
     factor : int
-        The factor by which the points are to be extended.        
-    
+        The factor by which the points are to be extended.
+
     Returns
     -------
     new_coords: list
@@ -70,19 +69,15 @@ def extend_points(tip={"x":0,"y":0,"z":0}, end={"x":0,"y":0,"z":0}, factor=2):
     ynew = factor * (end["y"] - tip["y"]) + tip["y"]
     znew = factor * (end["z"] - tip["z"]) + tip["z"]
     new_coords = [xnew, ynew, znew]
-    
-    new_coords = {
-        "x": xnew,
-        "y": ynew,
-        "z": znew
-    }
+
+    new_coords = {"x": xnew, "y": ynew, "z": znew}
     return new_coords
 
 
 def find_hover_text(output_data):
     """
     Parse the hover text from the API output.
-    
+
     Parameters
     ----------
     output_data : str
@@ -102,14 +97,14 @@ def find_hover_text(output_data):
 def get_calls(article_name, number_of_lines=7):
     """
     Call MediaWiki API.
-    
+
     Parameters
     ----------
     article_name : str
-        Name of the wikipedia article. 
+        Name of the wikipedia article.
     number_of_lines : int
         Number of exsentences to be returned from the API. Default: 7.
-    
+
     Returns
     -------
     data: str
@@ -133,6 +128,7 @@ def get_calls(article_name, number_of_lines=7):
     sys.stdout.flush()
     return data
 
+
 def call_mediawiki_api(
     titles,
     action="query",
@@ -142,12 +138,12 @@ def call_mediawiki_api(
     exlimit="1",
     explaintext="1",
     formatversion="2",
-    pllimit="max"
+    pllimit="max",
 ):
     """
     Call MediaWiki API.
     """
-    
+
     S = requests.Session()
     URL = "https://en.wikipedia.org/w/api.php"
 
@@ -160,7 +156,7 @@ def call_mediawiki_api(
         "exlimit": exlimit,
         "explaintext": explaintext,
         "formatversion": formatversion,
-        "pllimit": pllimit
+        "pllimit": pllimit,
     }
     R = S.get(url=URL, params=PARAMS)
     data = R.json()
