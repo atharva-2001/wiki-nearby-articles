@@ -5,6 +5,7 @@ import sys
 import requests
 import numpy as np
 from collections import defaultdict
+import plotly.graph_objects as go
 
 
 def random_points_in_a_sphere(h=0, g=0, f=0, num=0, radius=5):
@@ -133,10 +134,10 @@ def call_mediawiki_api(
     -------
     data: str
         Output of the API call.
-    
+
     Notes
     -----
-    Please visit the MediaWiki documentation 
+    Please visit the MediaWiki documentation
     to know more about the parameters used here.
     """
     S = requests.Session()
