@@ -24,7 +24,7 @@ class WNA:
             Points plotted in the figure.
         plot_all_points : bool
             Whether or not to plot all points.
-            
+
         """
         self.link = link
         if "wiki" not in link:
@@ -36,7 +36,7 @@ class WNA:
         self.plot_all_points = plot_all_points
         self.sections = 0
         self.fig = go.FigureWidget()
-        
+
         if points != {}:
             self.points = points
         else:
@@ -45,7 +45,7 @@ class WNA:
     def collect_points(self, center="", plot_index=0):
         """
         Collect points and add them to the points dictionary.
-        
+
         Parameters
         ----------
         center : string
@@ -165,7 +165,7 @@ class WNA:
     def return_points(self, drop=True):
         """
         Return all points except cluster centers.
-        
+
         Parameters
         ----------
         drop : bool
@@ -211,7 +211,7 @@ class WNA:
             Default: False.
         collect_points : bool
             Default: True.
-            
+
 
         Returns
         -------
@@ -234,7 +234,7 @@ class WNA:
                     DATA["query"]["pages"][0]["extract"]
                 )
                 hover_text.append(hover_text_for_one_point)
-                
+
             self.hover_text = hover_text
             return self.hover_text
         else:
@@ -245,7 +245,7 @@ class WNA:
         self,
         line_color="#d4d4d4",
         dot_color="#525BCB",
-    ):  
+    ):
         """
         Plot/update the figure.
 
@@ -254,8 +254,8 @@ class WNA:
         line_color : str
             Color of the lines. Default: "#d4d4d4"
         dot_color : str
-            Color of the surrounding dots. Default: "#525BCB"  
-            
+            Color of the surrounding dots. Default: "#525BCB"
+
         Returns
         -------
         fig: go.FigureWidget
@@ -266,9 +266,9 @@ class WNA:
                 # add the cluster center point
                 trace_names = [item.name for item in self.fig.data]
                 if cluster_name == self.article_name:
-                    dot_color_main = "#525BCB"
+                    dot_color_main = "#ffac12"
                     dot_size_main = 17
-                    opacity_main = 0.6
+                    opacity_main = 0.9
                 else:
                     dot_color_main = dot_color
                     dot_size_main = 9
@@ -286,6 +286,7 @@ class WNA:
                                 size=dot_size_main,
                                 color=dot_color_main,
                                 opacity=opacity_main,
+                                symbol="diamond-open",
                             ),
                             mode="markers+text",
                             hoverinfo="text",

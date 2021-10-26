@@ -1,6 +1,4 @@
-import flask
 import dash
-import json
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_gif_component as Gif
@@ -106,19 +104,28 @@ app.layout = html.Div(
                 "wiki nearby articles",
                 style={
                     "font-size": "72px",
-                    # "fontFamily": "monospace",
                     "letter-spacing": "5px",
                     "text-align": "center",
-                    "font-weight": "light",
+                    "font-weight": "500",
                     "color": "#525252",
-                    "text-shadow": "1.5px 1.5px lightgrey",
                 },
             )
         ),
         html.Div(
             [
                 html.Div(
-                    html.Button("Show me around", id="open-help"),
+                    html.Button(
+                        "Show me around",
+                        id="open-help",
+                        style={
+                            "text-align": "center",
+                            "font-size": "14px",
+                            "font-weight": "200",
+                            "color": "white",
+                            "background-color": "#555555",
+                            "border": "none",
+                        },
+                    ),
                     style={
                         "text-align": "center",
                     },
@@ -132,6 +139,7 @@ app.layout = html.Div(
                                         "What  is  this?",
                                         style={
                                             "font-size": "17px",
+                                            "font-weight": "bold",
                                             "letter-spacing": "2px",
                                             "text-align": "center",
                                             "margin": "auto",
@@ -256,6 +264,7 @@ app.layout = html.Div(
                     style={
                         "font-size": "17px",
                         "letter-spacing": "2px",
+                        "font-weight": "400",
                         # "fontFamily": "monospace",
                         "margin": "0  auto",
                         "display": "center",
@@ -357,7 +366,8 @@ app.layout = html.Div(
                     html.P(id="forward-hover-description"),
                     style={
                         "width": "26%",
-                        "font-size": "15.5px",
+                        "font-weight": "400",
+                        "font-size": "14px",
                         "height": "1000px",
                         "font-family": "monospace",
                         "display": "inline-block",
@@ -447,6 +457,7 @@ app.layout = html.Div(
                     html.P(id="backward-hover-description"),
                     style={
                         "width": "26%",
+                        "font-weight": "400",
                         "font-size": "15.5px",
                         "height": "1000px",
                         "font-family": "monospace",
