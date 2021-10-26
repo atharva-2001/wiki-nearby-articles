@@ -110,17 +110,35 @@ def call_mediawiki_api(
 
     Parameters
     ----------
-    article_name : str
+    titles : str
         Name of the wikipedia article.
-    number_of_lines : int
-        Number of exsentences to be returned from the API. Default: 7.
+    action: str
+        Default: "query"
+    format_ : str
+        Default: "json".
+    prop : str
+        Default: "extracts".
+    exsentences : str
+        Number of exsentences to be returned from the API. Default: "7".
+    exlimit : str
+        Default: "1".
+    explaintext : str
+        Default: "1".
+    formatversion : str
+        Default: "2".
+    pllimit : str
+        Default: "max".
 
     Returns
     -------
     data: str
         Output of the API call.
+    
+    Notes
+    -----
+    Please visit the MediaWiki documentation 
+    to know more about the parameters used here.
     """
-
     S = requests.Session()
     URL = "https://en.wikipedia.org/w/api.php"
 

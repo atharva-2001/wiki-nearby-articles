@@ -1,2 +1,2 @@
-__all__ = ["wna.py"]
+"""__init__.py file to export functions."""
 from . import wna
