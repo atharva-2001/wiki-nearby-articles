@@ -54,7 +54,7 @@ class WNA:
         plot_index : int
         """
         if self.points != {}:
-            self.points = self.points[0]
+            self.points = self.points
 
         if self.article_name not in self.points.keys():
             DATA = call_mediawiki_api(titles=self.article_name, prop=self.prop_params)
@@ -187,9 +187,9 @@ class WNA:
                 points_lst += self.points[key]["point_names"]
                 if key in points_lst:
                     points_lst = [item for item in points_lst if item != key]
-            return points_lst, self.sections
+            return points_lst
         else:
-            return self.points, self.sections
+            return self.points
 
     def article_summary_for_hover(
         self,

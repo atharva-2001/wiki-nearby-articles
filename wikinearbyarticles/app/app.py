@@ -467,8 +467,9 @@ app.layout = html.Div(
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
         return not is_open
-    dash.callback_context.response.delete_cookie('forward_points')
-    dash.callback_context.response.delete_cookie('backwards_points')
+    
+    for cookie in flask.request.cookies:
+        dash.callback_context.response.delete_cookie(cookie)
     return is_open
 
 
@@ -527,10 +528,14 @@ def update_output(
 ):
 
     try:
-        forward_points = json.loads(flask.request.cookies['forward_points'])
+        forward_points = {}
+        for cookie in flask.request.cookies:
+            if cookie.startswith('forward_points'):
+                forward_points[cookie.split("**")[1]] = json.loads(flask.request.cookies[cookie])
+            
     except:
         forward_points = {}
-        
+
     forwards = WNA(
         link=link_saved,
         prop_params="links",
@@ -542,7 +547,7 @@ def update_output(
     forwards.collect_points(center=fw_dropdown_value)
 
     # drop is True specifies that the points to return should be returned for the dropdown
-    forward_points_dropdown, section = forwards.return_points(drop=True)
+    forward_points_dropdown = forwards.return_points(drop=True)
 
     # generating items for the dropdown list below
     forward_points_dropdown = [
@@ -553,9 +558,11 @@ def update_output(
 
     forwards = forwards.plot()
     forwards["layout"] = net_layout
-
-    dash.callback_context.response.set_cookie(
-            'forward_points', json.dumps(forward_points).encode('utf-8'))
+    
+    for cluster, value in forward_points.items():
+        dash.callback_context.response.set_cookie(
+            "forward_points**" + cluster, json.dumps(value).encode('utf-8'))
+        
     
     return (
         forwards,  # the figure
@@ -584,7 +591,11 @@ def update_output(
 ):
 
     try:
-        backwards_points = json.loads(flask.request.cookies['backwards_points'])
+        backwards_points = {}
+        for cookie in flask.request.cookies:
+            if cookie.startswith('backwards_points'):
+                backwards_points[cookie.split("**")[1]] = json.loads(flask.request.cookies[cookie])
+            
     except:
         backwards_points = {}
     
@@ -596,7 +607,7 @@ def update_output(
     )
     backwards.collect_points(center=bw_dropdown_value)
 
-    backwards_points_dropdown, section = backwards.return_points(drop=True)
+    backwards_points_dropdown = backwards.return_points(drop=True)
 
     backwards_points_dropdown = [
         {"label": item, "value": item} for item in backwards_points_dropdown
@@ -605,13 +616,17 @@ def update_output(
     # section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
 
     backwards_points = backwards.return_points(drop=False)
+    
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
 
     dash.callback_context.response.set_cookie(
             'backwards_points', json.dumps(backwards_points).encode('utf-8'))
     
-
+    for cluster, value in backwards_points.items():
+        dash.callback_context.response.set_cookie(
+            "backwards_points**" + cluster, json.dumps(value).encode('utf-8'))
+        
     return backwards, backwards_points_dropdown
 
 
