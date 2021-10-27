@@ -3,32 +3,14 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_gif_component as Gif
 import requests
+import flask
+import json
 import dash_bootstrap_components as dbc
 from wikinearbyarticles.bin.wna import WNA
 from wikinearbyarticles.bin.util import call_mediawiki_api
 
 # TODO add animations
 # TODO between graphs as they are updated, extending graphs
-
-
-sess = requests.session()
-
-forward_points_dropdown_cookie = requests.cookies.create_cookie(
-    "forward_points_dropdown", []
-)
-forward_points_cookie = requests.cookies.create_cookie("forward_points", {})
-
-
-backwards_points_dropdown_cookie = requests.cookies.create_cookie(
-    "backwards_points_dropdown", []
-)
-backwards_points_cookie = requests.cookies.create_cookie("backwards_points", {})
-
-sess.cookies.set_cookie(forward_points_dropdown_cookie)
-sess.cookies.set_cookie(forward_points_cookie)
-
-sess.cookies.set_cookie(backwards_points_dropdown_cookie)
-sess.cookies.set_cookie(backwards_points_cookie)
 
 external_stylesheets = [
     "https://codepen.io/chriddyp/pen/bWLwgP.css",
@@ -485,6 +467,8 @@ app.layout = html.Div(
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
         return not is_open
+    dash.callback_context.response.delete_cookie('forward_points')
+    dash.callback_context.response.delete_cookie('backwards_points')
     return is_open
 
 
@@ -517,7 +501,7 @@ def save_link(n_clicks, link):
         "art_link_fw", "data"
     ),  # updating summary from saved article link
 )
-def update_summary(link):
+def update_summary(link):    
     summary_callback = None
     summary_raw = call_mediawiki_api(titles=link.split("/")[-1], exsentences="5")
     summary_callback = summary_raw["query"]["pages"][0]["extract"]
@@ -542,9 +526,11 @@ def update_output(
     link_saved,  # the link as saved in dcc.Store
 ):
 
-    cookies = sess.cookies.get_dict()
-    forward_points = cookies["forward_points"]
-
+    try:
+        forward_points = json.loads(flask.request.cookies['forward_points'])
+    except:
+        forward_points = {}
+        
     forwards = WNA(
         link=link_saved,
         prop_params="links",
@@ -568,16 +554,9 @@ def update_output(
     forwards = forwards.plot()
     forwards["layout"] = net_layout
 
-    forward_points_dropdown_cookie = requests.cookies.create_cookie(
-        "forward_points_dropdown", forward_points_dropdown
-    )
-    forward_points_cookie = requests.cookies.create_cookie(
-        "forward_points", forward_points
-    )
-
-    sess.cookies.set_cookie(forward_points_dropdown_cookie)
-    sess.cookies.set_cookie(forward_points_cookie)
-
+    dash.callback_context.response.set_cookie(
+            'forward_points', json.dumps(forward_points).encode('utf-8'))
+    
     return (
         forwards,  # the figure
         forward_points_dropdown,  # points for the dropdow
@@ -604,9 +583,11 @@ def update_output(
     link_saved,
 ):
 
-    cookies = sess.cookies.get_dict()
-    backwards_points = cookies["backwards_points"]
-
+    try:
+        backwards_points = json.loads(flask.request.cookies['backwards_points'])
+    except:
+        backwards_points = {}
+    
     backwards = WNA(
         link=link_saved,
         prop_params="linkshere",
@@ -627,15 +608,9 @@ def update_output(
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
 
-    backwards_points_dropdown_cookie = requests.cookies.create_cookie(
-        "backwards_points_dropdown", backwards_points_dropdown
-    )
-    backwards_points_cookie = requests.cookies.create_cookie(
-        "backwards_points", backwards_points
-    )
-
-    sess.cookies.set_cookie(backwards_points_dropdown_cookie)
-    sess.cookies.set_cookie(backwards_points_cookie)
+    dash.callback_context.response.set_cookie(
+            'backwards_points', json.dumps(backwards_points).encode('utf-8'))
+    
 
     return backwards, backwards_points_dropdown
 
@@ -695,7 +670,6 @@ def show_hover_text(data):
     else:
         text = "Loading..."
     return text
-
 
 def run(host="127.0.0.1", debug=True):
     app.run_server(debug=debug, host=host, port=50000)
