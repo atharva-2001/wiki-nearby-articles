@@ -1,15 +1,11 @@
-from dash_bootstrap_components.themes import DARKLY
 import flask
 import dash
 import dash_core_components as dcc
-from dash.dependencies import Input, State, Output
 import dash_html_components as html
-from dash_html_components.Div import Div
-import dash_gif_component as Gif
-import requests
-import numpy as np
+import json
 import dash_bootstrap_components as dbc
 from wikinearbyarticles.bin.wna import WNA
+from wikinearbyarticles.bin.util import random_cluster_center
 
 points = {}
 external_stylesheets = [
@@ -52,20 +48,6 @@ net_layout = {
 }
 
 
-def random_cluster_center(points):  # Shadows name points in outer scope
-    filtered_points = []
-    if points != {}:
-        points = points[0]
-        for key in points.keys():
-            filtered_points += points[key]["point_names"]
-            if key in points:
-                filtered_points = [item for item in filtered_points if item != key]
-                # print(filtered_points)
-        r_int = np.random.randint(0, len(filtered_points) - 1)
-        # print(r_int, len(filtered_points))
-        return filtered_points[r_int]
-    else:
-        return None
 
 
 app = dash.Dash(
@@ -73,7 +55,6 @@ app = dash.Dash(
     # external_stylesheets=[dbc.themes.DARKLY]
     external_stylesheets=external_stylesheets,
 )
-
 
 app.layout = html.Div(
     [
@@ -135,7 +116,6 @@ app.layout = html.Div(
     ]
 )
 
-
 @app.callback(
     dash.dependencies.Output("auto", "figure"),
     [
@@ -145,8 +125,13 @@ app.layout = html.Div(
     dash.dependencies.State("art_link", "value"),
 )
 def update_data(clicks, n_intervals, link):
-    global points
-
+    if n_intervals is None:
+        points = {}
+        for cookie,val in flask.request.cookies.items():
+            dash.callback_context.response.delete_cookie(cookie) 
+    else:
+        points = json.loads(flask.request.cookies["points"])
+    
     auto = WNA(
         link=link,
         points_in_one_shot=5,
@@ -154,15 +139,22 @@ def update_data(clicks, n_intervals, link):
         points=points,
         plot_all_points=False,
     )
-
-    center = random_cluster_center(points=points)
-    print(f"adding {center}...")
-    auto.collect_points(center=random_cluster_center(points=points))
-    auto_points = auto.return_points(drop=False)
-    points = auto_points
+    
+    if not points:
+        print("adding *main*...")
+        auto.collect_points()
+        points = auto.return_points(drop=False)
+    else:
+        center = random_cluster_center(points=points)
+        print(f"adding {center}...")
+        auto.collect_points(center=center)
+        points = auto.return_points(drop=False)
 
     auto = auto.plot(dot_color="#ff3b3b")
     auto["layout"] = net_layout
+    
+    dash.callback_context.response.set_cookie(
+            "points", json.dumps(points).encode('utf-8'))
 
     return auto
 
@@ -171,9 +163,7 @@ def run(host="127.0.0.1", debug=True):
     app.run_server(
         debug=debug,
         host=host,
-        port=8041,
-        dev_tools_ui=False,
-        dev_tools_props_check=False,
+        port=8042,
     )
 
 

@@ -158,3 +158,29 @@ def call_mediawiki_api(
     data = R.json()
     S.close()
     return data
+
+
+def random_cluster_center(points):  
+    """
+    Find a random point to create a cluster from.
+
+    Parameters
+    ----------
+    points : dict
+        The points dictionary.
+
+    Returns
+    -------
+    center: str
+        Random point.
+    """
+    filtered_points = []
+    for key in points.keys():
+        filtered_points += points[key]["point_names"]
+        if key in points:
+            filtered_points = [item for item in filtered_points if item != key]
+    center = filtered_points[np.random.randint(0, len(filtered_points))]
+    return center
+
+
+    
