@@ -8,12 +8,7 @@
 
 This is a dash app that visualises connections between Wikipedia articles. Visit the app here: 
 https://wiki-nearby-articles.herokuapp.com
-In order to try the app, clone the repo and install the required dependencies. 
-Then run the ```run.py``` file:  
-  
-  
-```python run.py```
-
+You can run the app locally by running the `run.py` file and installing the required dependencies. 
 Work in progress by Atharva Arya.
 
-![](https://github.com/atharva-2001/wiki-nearby-articles/blob/main/wikinearbyarticles/bin/gifs/Peek%202021-01-22%2019-19.gif)
+![](https://github.com/atharva-2001/wiki-nearby-articles/blob/main/wikinearbyarticles/bin/gifs/screencapture.png)
