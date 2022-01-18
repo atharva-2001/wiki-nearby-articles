@@ -141,10 +141,18 @@ app.layout = html.Div(
                                         )
                                     ),
                                     html.P(
-                                        "Use the dropdown to create connections. In the first graph, which has blue points, the dropdown has names of articles that are mentioned in the parent article. For example, the wikipedia article of Atom mentions the wikipedia article of Electron. The Cluster of Atom will have Electron as a point. You can similarly expand the cluster of Electron and see what articles are mentioned in it's article. You can do that by selecting electron from the dropdown. "
+                                        "Use the dropdown to create connections. In the first graph, the one with blue points, the dropdown has names of articles "
+                                        "that are mentioned in the parent article (only the first few, for various reasons). For example, "
+                                        "because the wikipedia article of Atom mentions the wikipedia article of Antielectrons, "
+                                        "the Cluster of Atom will have 'Antielectron' as a point. You can similarly expand the cluster of Antielectron "
+                                        "and see what articles are mentioned in it's article. You can do that by selecting Antielectron from the dropdown. "
                                     ),
                                     html.P(
-                                        "The second graph is the exact opposite of the first graph. Here, the articles that mention the article of Atom, surround it. For example, the wikipedia article of Albert Einstein mentions the wikipedia article of Atom. Hence, it is a point in the cluster of Atom. If you select Albert Einstein from the dropdown, all the articles which mention Albert Einstein will surround it. "
+                                        "The second graph is the exact opposite of the first graph. "
+                                        "Here, the articles that mention the article of Atom, surround it. "
+                                        "For example, the wikipedia article of Albert Einstein mentions the wikipedia article of Atom. "
+                                        "Hence, it is a point in the cluster of Atom. If you select Albert Einstein from the dropdown, "
+                                        "all the articles which mention Albert Einstein will surround it."
                                     ),
                                 ],
                                 style={"font-size": "14px"},
@@ -467,7 +475,7 @@ app.layout = html.Div(
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
         return not is_open
-    
+
     for cookie in flask.request.cookies:
         dash.callback_context.response.delete_cookie(cookie)
     return is_open
@@ -502,7 +510,7 @@ def save_link(n_clicks, link):
         "art_link_fw", "data"
     ),  # updating summary from saved article link
 )
-def update_summary(link):    
+def update_summary(link):
     summary_callback = None
     summary_raw = call_mediawiki_api(titles=link.split("/")[-1], exsentences="5")
     summary_callback = summary_raw["query"]["pages"][0]["extract"]
@@ -530,9 +538,11 @@ def update_output(
     try:
         forward_points = {}
         for cookie in flask.request.cookies:
-            if cookie.startswith('forward_points'):
-                forward_points[cookie.split("**")[1]] = json.loads(flask.request.cookies[cookie])
-            
+            if cookie.startswith("forward_points"):
+                forward_points[cookie.split("**")[1]] = json.loads(
+                    flask.request.cookies[cookie]
+                )
+
     except:
         forward_points = {}
 
@@ -558,12 +568,12 @@ def update_output(
 
     forwards = forwards.plot()
     forwards["layout"] = net_layout
-    
+
     for cluster, value in forward_points.items():
         dash.callback_context.response.set_cookie(
-            "forward_points**" + cluster, json.dumps(value).encode('utf-8'))
-        
-    
+            "forward_points**" + cluster, json.dumps(value).encode("utf-8")
+        )
+
     return (
         forwards,  # the figure
         forward_points_dropdown,  # points for the dropdow
@@ -593,12 +603,14 @@ def update_output(
     try:
         backwards_points = {}
         for cookie in flask.request.cookies:
-            if cookie.startswith('backwards_points'):
-                backwards_points[cookie.split("**")[1]] = json.loads(flask.request.cookies[cookie])
-            
+            if cookie.startswith("backwards_points"):
+                backwards_points[cookie.split("**")[1]] = json.loads(
+                    flask.request.cookies[cookie]
+                )
+
     except:
         backwards_points = {}
-    
+
     backwards = WNA(
         link=link_saved,
         prop_params="linkshere",
@@ -616,17 +628,19 @@ def update_output(
     # section = [{"label": "part" + str(ind + 1), "value": ind} for ind in range(section)]
 
     backwards_points = backwards.return_points(drop=False)
-    
+
     backwards = backwards.plot(dot_color="#ff3b3b")
     backwards["layout"] = net_layout
 
     dash.callback_context.response.set_cookie(
-            'backwards_points', json.dumps(backwards_points).encode('utf-8'))
-    
+        "backwards_points", json.dumps(backwards_points).encode("utf-8")
+    )
+
     for cluster, value in backwards_points.items():
         dash.callback_context.response.set_cookie(
-            "backwards_points**" + cluster, json.dumps(value).encode('utf-8'))
-        
+            "backwards_points**" + cluster, json.dumps(value).encode("utf-8")
+        )
+
     return backwards, backwards_points_dropdown
 
 
@@ -685,6 +699,7 @@ def show_hover_text(data):
     else:
         text = "Loading..."
     return text
+
 
 def run(host="127.0.0.1", debug=True):
     app.run_server(debug=debug, host=host, port=50000)

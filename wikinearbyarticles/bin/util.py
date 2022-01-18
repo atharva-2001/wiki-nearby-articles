@@ -160,7 +160,7 @@ def call_mediawiki_api(
     return data
 
 
-def random_cluster_center(points):  
+def random_cluster_center(points):
     """
     Find a random point to create a cluster from.
 
@@ -181,6 +181,3 @@ def random_cluster_center(points):
             filtered_points = [item for item in filtered_points if item != key]
     center = filtered_points[np.random.randint(0, len(filtered_points))]
     return center
-
-
-    

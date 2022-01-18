@@ -48,8 +48,6 @@ net_layout = {
 }
 
 
-
-
 app = dash.Dash(
     __name__,
     # external_stylesheets=[dbc.themes.DARKLY]
@@ -116,6 +114,7 @@ app.layout = html.Div(
     ]
 )
 
+
 @app.callback(
     dash.dependencies.Output("auto", "figure"),
     [
@@ -127,11 +126,11 @@ app.layout = html.Div(
 def update_data(clicks, n_intervals, link):
     if n_intervals is None:
         points = {}
-        for cookie,val in flask.request.cookies.items():
-            dash.callback_context.response.delete_cookie(cookie) 
+        for cookie, val in flask.request.cookies.items():
+            dash.callback_context.response.delete_cookie(cookie)
     else:
         points = json.loads(flask.request.cookies["points"])
-    
+
     auto = WNA(
         link=link,
         points_in_one_shot=5,
@@ -139,7 +138,7 @@ def update_data(clicks, n_intervals, link):
         points=points,
         plot_all_points=False,
     )
-    
+
     if not points:
         print("adding *main*...")
         auto.collect_points()
@@ -152,9 +151,10 @@ def update_data(clicks, n_intervals, link):
 
     auto = auto.plot(dot_color="#ff3b3b")
     auto["layout"] = net_layout
-    
+
     dash.callback_context.response.set_cookie(
-            "points", json.dumps(points).encode('utf-8'))
+        "points", json.dumps(points).encode("utf-8")
+    )
 
     return auto
 
